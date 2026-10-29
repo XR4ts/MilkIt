@@ -1,0 +1,94 @@
+# ==========================================
+# Unity generated files and folders
+# ==========================================
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+MemoryCaptures/
+Recordings/
+
+# Build outputs
+[Bb]uild/
+[Bb]uilds/
+[Dd]ist/
+ExportedObj/
+
+# Asset import and crash files
+sysinfo.txt
+*.stackdump
+*.crash
+*.dmp
+
+# ==========================================
+# Unity IDE and editor files
+# ==========================================
+.vs/
+.idea/
+.vscode/
+.gradle/
+
+# Visual Studio
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svclog
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+
+# Rider
+*.sln.iml
+
+# ==========================================
+# Operating system files
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ==========================================
+# Unity package and build caches
+# ==========================================
+**/PackageCache/
+**/Artifacts/
+
+# ==========================================
+# Logs and temporary files
+# ==========================================
+*.log
+*.tmp
+*.temp
+*.bak
+*.orig
+*.swp
+*.swo
+
+# ==========================================
+# Optional: local environment files
+# ==========================================
+.env
+.env.*
+!.env.example
+
+# ==========================================
+# Keep Unity project source files tracked
+# ==========================================
+# Do NOT ignore:
+# Assets/
+# Packages/
+# ProjectSettings/
+# User project source files
+# 

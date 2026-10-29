@@ -1,0 +1,2 @@
+MilkIt/Library/ArtifactDB filter=lfs diff=lfs merge=lfs -text
+MilkIt/Library/PackageCache/** filter=lfs diff=lfs merge=lfs -text
