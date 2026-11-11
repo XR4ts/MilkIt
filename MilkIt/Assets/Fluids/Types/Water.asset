@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c1d96d4d398c2757a8bf1ec194933d2, type: 3}
+  m_Name: Water
+  m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Fluids.FluidType
+  displayName: Water
+  color: {r: 0.55, g: 0.8, b: 1, a: 1}
+  state: 0
+  material: {fileID: 2100000, guid: 05d5c30d0c4f745efa08c9fa2784de62, type: 2}
