@@ -16,6 +16,7 @@ public class WristMenuController : MonoBehaviour
 
     [Header("Buttons")]
     [SerializeField] Button pauseButton;
+    [SerializeField] TMP_Text pauseButtonText;
     [SerializeField] Button resetButton;
     [SerializeField] Button settingsButton;
     [SerializeField] Button backFromSettingsButton;
@@ -101,6 +102,10 @@ public class WristMenuController : MonoBehaviour
     {
         isPaused = !isPaused;
         Time.timeScale = isPaused ? 0f : 1f;
+        if (pauseButtonText != null)
+        {
+            pauseButtonText.text = isPaused ? "Resume" : "Pause";
+        }
         Debug.Log(isPaused ? "Game Paused" : "Game Resumed");
     }
 

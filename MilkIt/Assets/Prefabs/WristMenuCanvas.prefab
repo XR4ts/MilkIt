@@ -501,6 +501,7 @@ MonoBehaviour:
   leftHand: {fileID: 0}
   head: {fileID: 0}
   pauseButton: {fileID: 6039826159727834380}
+  pauseButtonText: {fileID: 7284363259522623358}
   resetButton: {fileID: 574310513658806721}
   settingsButton: {fileID: 8135114592732805350}
   backFromSettingsButton: {fileID: 3602755679415449075}
