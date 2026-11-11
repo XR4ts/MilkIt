@@ -12,6 +12,12 @@ The NavMesh is baked into `Cafe_NPC_NavMesh.asset` from the floor, entrance walk
 
 The initial integration uses three specific booth seats. Moving the building or furniture requires updating the route markers and rebaking the navigation data. The setup builder creates the integration scene only when it does not exist; it will not overwrite your edits.
 
+## Character animation preview
+
+**MilkIt > NPCs > Open character animation preview** generates (first time only) and opens `Assets/NPCs/Scenes/NPC_CharacterPreview.unity`. Press Play and use the buttons to preview all 24 Quaternius clips on one man (`Men/Casual_Hoodie.fbx`) and one woman (`Women/Casual.fbx`). **Rebuild character preview assets** regenerates everything, including the scene.
+
+The setup imports both models as Generic rigs, names clips without the `CharacterArmature|` prefix, loops idle/walk/run clips, remaps materials to editable URP Lit copies, and writes animator controllers and visual prefabs to `Characters/Quaternius/Generated/`. Each prefab root is 1.75 m tall, feet at y = 0, facing +Z; root motion is off and Walk plays in place. One-shot clips return to Idle. The packs contain no sitting animation. This preview is not connected to the customer system yet. Models are CC0 (see `License.txt`).
+
 ## Original test room
 
 Open **Assets/NPCs/Scenes/NPC_Test.unity** (or **MilkIt > NPCs > Open customer test scene**) and press Play. This is a standalone test room with an overhead camera; it does not require a headset or the XR simulator.
