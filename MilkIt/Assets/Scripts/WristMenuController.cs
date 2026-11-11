@@ -2,39 +2,44 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Utilities;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class WristMenuController : MonoBehaviour
 {
     [Header("Scene references")]
     [SerializeField] GameObject wristMenuCanvas;
+    [SerializeField] GameObject mainButtonsPanel;
+    [SerializeField] GameObject settingsPanel;
     [SerializeField] Transform leftHand;
     [SerializeField] Transform head;
-    [SerializeField] Button testButton;
+
+    [Header("Buttons")]
+    [SerializeField] Button pauseButton;
+    [SerializeField] Button resetButton;
+    [SerializeField] Button settingsButton;
+    [SerializeField] Button backFromSettingsButton;
+    [SerializeField] Button quitButton;
 
     [Header("Placement")]
     [Tooltip("World-space offset from the left controller, in meters.")]
     [SerializeField] Vector3 offsetFromHand = new Vector3(0f, 0.12f, 0f);
     [SerializeField] bool startOpen = true;
 
-    [Header("Test UI")]
-    [SerializeField] TMP_Text testButtonLabel;
-    [SerializeField] TMP_Text debugLabel;
-    [SerializeField] bool showPressedButtons = true;
-
     InputAction toggleAction;
-    IDisposable anyButtonListener;
     bool isOpen;
-    int clickCount;
+    bool isPaused;
 
     void Awake()
     {
+        if (wristMenuCanvas != null && head != null &&
+            wristMenuCanvas.TryGetComponent(out Canvas canvas) &&
+            head.TryGetComponent(out Camera cam))
+            canvas.worldCamera = cam;
+
         toggleAction = new InputAction("Toggle Wrist Menu", InputActionType.Button);
         toggleAction.AddBinding("<XRController>{LeftHand}/{MenuButton}");
         toggleAction.AddBinding("<XRController>{RightHand}/{MenuButton}");
-        toggleAction.AddBinding("<Gamepad>/start");
-        toggleAction.AddBinding("<Gamepad>/select");
         toggleAction.AddBinding("<Keyboard>/m");
         SetOpen(startOpen);
     }
@@ -43,18 +48,24 @@ public class WristMenuController : MonoBehaviour
     {
         toggleAction.performed += OnTogglePerformed;
         toggleAction.Enable();
-        if (showPressedButtons)
-            anyButtonListener = InputSystem.onAnyButtonPress.Call(OnAnyButtonPressed);
-        if (testButton != null) testButton.onClick.AddListener(OnTestButtonClicked);
+
+        if (pauseButton) pauseButton.onClick.AddListener(TogglePause);
+        if (resetButton) resetButton.onClick.AddListener(ResetObjects);
+        if (settingsButton) settingsButton.onClick.AddListener(OpenSettings);
+        if (backFromSettingsButton) backFromSettingsButton.onClick.AddListener(CloseSettings);
+        if (quitButton) quitButton.onClick.AddListener(QuitGame);
     }
 
     void OnDisable()
     {
         toggleAction.performed -= OnTogglePerformed;
         toggleAction.Disable();
-        anyButtonListener?.Dispose();
-        anyButtonListener = null;
-        if (testButton != null) testButton.onClick.RemoveListener(OnTestButtonClicked);
+
+        if (pauseButton) pauseButton.onClick.RemoveListener(TogglePause);
+        if (resetButton) resetButton.onClick.RemoveListener(ResetObjects);
+        if (settingsButton) settingsButton.onClick.RemoveListener(OpenSettings);
+        if (backFromSettingsButton) backFromSettingsButton.onClick.RemoveListener(CloseSettings);
+        if (quitButton) quitButton.onClick.RemoveListener(QuitGame);
     }
 
     void OnDestroy() => toggleAction.Dispose();
@@ -70,7 +81,6 @@ public class WristMenuController : MonoBehaviour
     }
 
     void OnTogglePerformed(InputAction.CallbackContext _) => ToggleMenu();
-
     public void ToggleMenu() => SetOpen(!isOpen);
 
     void SetOpen(bool open)
@@ -78,20 +88,47 @@ public class WristMenuController : MonoBehaviour
         isOpen = open;
         if (wristMenuCanvas != null)
             wristMenuCanvas.SetActive(open);
+
+        // reset panels when closing
+        if (!open && settingsPanel)
+        {
+            settingsPanel.SetActive(false);
+            if (mainButtonsPanel) mainButtonsPanel.SetActive(true);
+        }
     }
 
-    public void OnTestButtonClicked()
+    public void TogglePause()
     {
-        clickCount++;
-        if (testButtonLabel != null)
-            testButtonLabel.text = $"Clicked {clickCount}x";
+        isPaused = !isPaused;
+        Time.timeScale = isPaused ? 0f : 1f;
+        Debug.Log(isPaused ? "Game Paused" : "Game Resumed");
     }
 
-    void OnAnyButtonPressed(InputControl control)
+    public void ResetObjects()
     {
-        if (debugLabel == null)
-            return;
-        var hand = control.device.usages.Count > 0 ? control.device.usages[0].ToString() : "-";
-        debugLabel.text = $"{control.device.name} [{hand}]\n{control.name}";
+        // TODO: object reset logic
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void OpenSettings()
+    {
+        if (mainButtonsPanel) mainButtonsPanel.SetActive(false);
+        if (settingsPanel) settingsPanel.SetActive(true);
+    }
+
+    public void CloseSettings()
+    {
+        if (settingsPanel) settingsPanel.SetActive(false);
+        if (mainButtonsPanel) mainButtonsPanel.SetActive(true);
+    }
+
+    public void QuitGame()
+    {
+        Debug.Log("Quitting application...");
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }
