@@ -2,21 +2,34 @@
 
 ## Real café integration
 
-Open **MilkIt > NPCs > Open cafe with customers**, or **Assets/NPCs/Scenes/Cafe_NPC.unity**, then press Play. Use **Spawn customer** and the serving buttons as in the test room. Customers start on the outside walkway, pass through automatic sliding doors, queue at the real till, and use three booths along the left wall.
+Open **MilkIt > NPCs > Open cafe with customers**, or **Assets/NPCs/Scenes/Cafe_NPC.unity**, then press Play. Pick a **Party size** (1–4) and click **Spawn**. Customers start on the outside walkway, pass through automatic sliding doors, queue at the real till, order, and sit at one of the seven booths.
 
-This scene is a copy of Cafe.unity. It has an overhead observation camera, the ceiling hidden, and the original XR rig inactive so you can inspect the entire route. The original Cafe.unity is untouched. Character and sitting animation remain placeholders, and drink delivery still uses the debug buttons.
+**MilkIt > NPCs > Update cafe tables and characters** upgrades an existing Cafe_NPC scene in place (it replaces the original three single seats): every booth becomes a table with four seats (two per bench, facing each other), the queue gets five spots, a "Leave till" waypoint is added and customers use the character visuals. Re-running it rebuilds only those objects.
+
+- **Characters:** customers use the generated Humanoid prefabs (`characterPrefabs` on the Customer System, filled by the update menu); the capsule is hidden. Members of one party always get different outfits. They walk/idle from their NavMesh speed, talk while ordering, step into the booth, sit down, sip with a cup while drinking, stand up and leave. With no character prefabs assigned, the capsule behaviour is unchanged (used by NPC_Test).
+- **Parties:** a party queues together, each member orders their own drink (one order ID each), the party sits at one table, chats while seated (SitTalk) and leaves together once everyone has finished. Wall-side seats go to the first arrivals so nobody slides past a seated friend.
+- **Seat choice:** an empty table first; otherwise, with **Share tables** on, free seats at a partly used table.
+- **Flow:** after ordering, customers leave the till westward along the counter, so they never meet the queue head-on in the narrow gap between the condiment bar and the queue rail.
+
+This scene is a copy of Cafe.unity. It has an overhead observation camera, the ceiling hidden, and the original XR rig inactive so you can inspect the entire route. The original Cafe.unity is untouched. Drink delivery still uses the debug buttons.
 
 The NavMesh is baked into `Cafe_NPC_NavMesh.asset` from the floor, entrance walkway, wall geometry, and conservative furniture bounds. The movable doors are excluded from that bake; `CafeSlidingDoor` opens on approach and the customer controller waits near the threshold until they are open. Doors stay open while a customer is nearby and close after a delay. The optional player-head reference also opens them when its VR rig is active.
 
 **MilkIt > NPCs > Validate cafe customer route** runs three visits and stops Play mode afterward. It checks all marker paths, unique seat reservations, six open-door crossings, closing after departure, and seat release. A compact result is written to the system temporary folder as `milkit-cafe-validation.txt`.
 
-The initial integration uses three specific booth seats. Moving the building or furniture requires updating the route markers and rebaking the navigation data. The setup builder creates the integration scene only when it does not exist; it will not overwrite your edits.
+Booth seat positions are derived from each booth's transform. Moving the building or furniture requires re-running the update menu and rebaking the navigation data. The setup builder creates the integration scene only when it does not exist.
 
 ## Character animation preview
 
-**MilkIt > NPCs > Open character animation preview** generates (first time only) and opens `Assets/NPCs/Scenes/NPC_CharacterPreview.unity`. Press Play and use the buttons to preview all 24 Quaternius clips on one man (`Men/Casual_Hoodie.fbx`) and one woman (`Women/Casual.fbx`). **Rebuild character preview assets** regenerates everything, including the scene.
+**MilkIt > NPCs > Open character animation preview** generates (first time, or when assets are out of date) and opens `Assets/NPCs/Scenes/NPC_CharacterPreview.unity`. Press Play and use the buttons on one man and one woman. **Rebuild character preview assets** regenerates everything, including the scene.
 
-The setup imports both models as Generic rigs, names clips without the `CharacterArmature|` prefix, loops idle/walk/run clips, remaps materials to editable URP Lit copies, and writes animator controllers and visual prefabs to `Characters/Quaternius/Generated/`. Each prefab root is 1.75 m tall, feet at y = 0, facing +Z; root motion is off and Walk plays in place. One-shot clips return to Idle. The packs contain no sitting animation. This preview is not connected to the customer system yet. Models are CC0 (see `License.txt`).
+- Models: 12 Humanoid outfits from the packs' "Humanoid Rig(s)" folders (`Men/` and `Women/*_Humanoid.fbx`): men Hoodie, Casual, Suit, Worker, Punk, Beach; women Casual, Formal, Suit, Worker, Punk, Adventurer. Heights vary (men 1.74–1.84 m, women 1.64–1.72 m). To add another outfit, copy its FBX as `<Outfit>_Humanoid.fbx` and add one line to `CharacterPreviewSetup.Characters`. The animated `Casual_Hoodie.fbx` / `Casual.fbx` variants are not valid Humanoids and are no longer used.
+- Animations: Quaternius Universal Animation Library, free Standard version (`Characters/Quaternius/Animations/UAL1_Standard.fbx`, CC0), retargeted through Humanoid. All root movement is baked into the pose, so characters stay where code places them, facing +Z.
+- States: Idle, Walk, Talk, Interact, PickUp, SitDown (continues into SitIdle), SitIdle, SitTalk, StandUp (continues into Idle).
+- Drink: a generated right-arm clip (`Generated/Drink.anim`) on the `Arms` layer with a right-arm mask, so it plays on top of SitIdle/SitTalk and returns to the base pose on its own. A placeholder cup in the right hand is visible only while drinking.
+- Sitting places the hips about 0.45 m high and 0.25–0.3 m behind the character's root; the preview seats are 45 cm cubes.
+
+Generated controllers, prefabs, materials, mask and drink clip live in `Characters/Quaternius/Generated/`. The preview is not connected to the customer system yet.
 
 ## Original test room
 
@@ -43,8 +56,9 @@ Select **Customer System** to inspect the entrance, exit, ordered queue markers,
 - `CafeCustomerSystem.OrderPlaced(int orderId, string drink)` fires once at the counter. An order ID identifies a visit, not just a recipe.
 - Call `TryDeliverDrink(orderId, drink)` after delivery to the matching customer's table. It returns false for an unknown order, wrong drink, duplicate delivery, or a customer who is not yet seated and waiting.
 - `CustomerLeft(int orderId)` reports a completed visit. `CompletedVisits` counts those visits.
+- `TrySpawnParty(int size)` spawns 1–4 customers who share a table; `TrySpawnCustomer()` is a party of one.
 - The current string drink IDs are placeholders. Agree on shared recipe IDs with the teammate implementing drink preparation before integrating.
-- Unreachable routes or movement blocked for 45 seconds warn in the Console, remove the affected customer, and release its queue position/seat. Waiting at a queue marker or waiting for a drink has no patience timeout yet.
+- Unreachable routes or movement blocked for 45 seconds warn in the Console, remove the affected customer, and release its queue position/seat. Waiting at a queue marker or waiting for a drink has no patience timeout yet. Party members wait for each other before leaving.
 
 Keep approaches beside chairs, outside furniture collision volumes. The real café integration above uses its own baked NavMesh instead of `PrototypeNavigation`. The customer logic deliberately does not depend on the VR player or coffee machine.
 

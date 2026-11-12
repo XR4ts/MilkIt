@@ -23,6 +23,7 @@ namespace MilkIt.NPCs.Editor
         public static void Build()
         {
             if (File.Exists(ScenePath)) throw new InvalidOperationException("Cafe_NPC already exists; open it instead of overwriting it.");
+            EnsureCharacterPrefabs(); // may open its own scene, so run it before opening Cafe_NPC
             if (!AssetDatabase.CopyAsset("Assets/Scenes/Cafe.unity", ScenePath))
                 throw new InvalidOperationException("Could not copy Cafe.unity.");
             var scene = EditorSceneManager.OpenScene(ScenePath);
@@ -34,24 +35,9 @@ namespace MilkIt.NPCs.Editor
             system.entrance = Marker("Customer spawn outside", new Vector3(1.8f, 0, 13.5f), root.transform);
             system.exit = Marker("Customer exit outside", new Vector3(0.3f, 0, 13.5f), root.transform);
             system.entryWaypoint = Marker("Inside entrance", new Vector3(1.1f, 0, 8.2f), root.transform);
-            system.queuePositions = new[]
-            {
-                Marker("Order at till", new Vector3(3.27f, 0, 3.5f), root.transform),
-                Marker("Queue 2", new Vector3(3.27f, 0, 4.8f), root.transform),
-                Marker("Queue 3", new Vector3(3.27f, 0, 6.1f), root.transform)
-            };
-            foreach (var point in system.queuePositions) point.rotation = Quaternion.Euler(0, 180, 0);
-            system.seats = new CustomerSeat[3];
-            string[] booths = { "booth (3)", "booth (2)", "booth (1)" };
-            for (int i = 0; i < booths.Length; i++)
-            {
-                var booth = building.Find("Booths/" + booths[i]);
-                var seat = new GameObject("Customer seat " + (i + 1)).AddComponent<CustomerSeat>();
-                seat.transform.SetParent(root.transform);
-                seat.approach = Marker("Walk beside booth", new Vector3(-2.1f, 0, booth.position.z - 0.45f), seat.transform);
-                seat.sittingPose = Marker("Sit on bench", new Vector3(-3.1f, 1.1f, booth.position.z - 0.48f), seat.transform);
-                system.seats[i] = seat;
-            }
+            ConfigureQueue(system, root.transform);
+            ConfigureTables(system, building, root.transform);
+            ConfigureCharacters(system);
 
             var left = building.Find("WallFront/Entrance/Left_Door (1)");
             var right = building.Find("WallFront/Entrance/Right_Door (1)");
@@ -124,7 +110,129 @@ namespace MilkIt.NPCs.Editor
             camera.gameObject.AddComponent<AudioListener>();
             EditorSceneManager.SaveScene(scene);
             AssetDatabase.SaveAssets();
-            Debug.Log("CAFE_NPC_READY: three booth seats, till queue, outside walkway and automatic doors.");
+            Debug.Log("CAFE_NPC_READY: booth tables, till queue, outside walkway and automatic doors.");
+        }
+
+        // Upgrades an existing Cafe_NPC scene in place: all booths become 4-seat tables, the queue gets
+        // room for a party of four, and customers use the generated character visuals.
+        [MenuItem("MilkIt/NPCs/Update cafe tables and characters")]
+        public static void UpdateTablesAndCharacters()
+        {
+            if (EditorApplication.isPlaying || !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            if (!File.Exists(ScenePath)) { Build(); return; }
+            EnsureCharacterPrefabs();
+            var scene = EditorSceneManager.OpenScene(ScenePath);
+            var system = UnityEngine.Object.FindFirstObjectByType<CafeCustomerSystem>()
+                         ?? throw new InvalidOperationException("Cafe_NPC has no CafeCustomerSystem.");
+            var building = GameObject.Find("Building").transform;
+            ConfigureQueue(system, system.transform);
+            ConfigureTables(system, building, system.transform);
+            ConfigureCharacters(system);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log($"CAFE_NPC_UPDATED: {system.tables.Length} tables, {system.seats.Length} seats, {system.queuePositions.Length} queue spots.");
+        }
+
+        static readonly Vector3[] QueueSpots =
+        {
+            new Vector3(3.27f, 0, 3.5f), new Vector3(3.27f, 0, 4.8f), new Vector3(3.2f, 0, 6.1f),
+            new Vector3(2.85f, 0, 7.3f), new Vector3(2.3f, 0, 8.4f),
+        };
+
+        static void ConfigureQueue(CafeCustomerSystem system, Transform root)
+        {
+            var names = new[] { "Order at till", "Queue 2", "Queue 3", "Queue 4", "Queue 5" };
+            var markers = new Transform[QueueSpots.Length];
+            for (var i = 0; i < markers.Length; i++)
+            {
+                var existing = system.queuePositions != null && i < system.queuePositions.Length ? system.queuePositions[i] : null;
+                markers[i] = existing != null ? existing : Marker(names[i], QueueSpots[i], root);
+                markers[i].position = QueueSpots[i];
+                markers[i].rotation = Quaternion.Euler(0, 180, 0);
+            }
+            system.queuePositions = markers;
+            // One-way flow: leave the till west along the counter, while the queue arrives from the north
+            // through the narrow gap between the condiment bar and the queue rail.
+            if (system.tillExit == null) system.tillExit = Marker("Leave till", Vector3.zero, root);
+            system.tillExit.position = new Vector3(0.3f, 0, 3.7f);
+        }
+
+        // Booth geometry (metres, from the booth's centre). Benches sit at either end along Z and face the
+        // table; the sitting clip puts the hips HipsBehindRoot behind the character root.
+        const float BenchOffset = 0.5f, HipsBehindRoot = 0.3f, SeatSideOffset = 0.33f, AisleOffset = 1.14f;
+
+        static void ConfigureTables(CafeCustomerSystem system, Transform building, Transform root)
+        {
+            // Remove the original three single seats and any previous table setup.
+            foreach (var old in root.GetComponentsInChildren<CustomerSeat>(true))
+                if (old != null && old.transform.parent == root) UnityEngine.Object.DestroyImmediate(old.gameObject);
+            var previous = root.Find("Customer tables");
+            if (previous != null) UnityEngine.Object.DestroyImmediate(previous.gameObject);
+
+            var tablesRoot = new GameObject("Customer tables").transform;
+            tablesRoot.SetParent(root);
+            var tables = new List<CafeTable>();
+            var seats = new List<CustomerSeat>();
+            foreach (Transform booth in building.Find("Booths"))
+            {
+                var centre = booth.position;
+                var aisle = centre.x < 1f ? 1f : -1f; // left-wall booths open toward +X
+                var table = new GameObject("Table " + booth.name).AddComponent<CafeTable>();
+                table.transform.SetParent(tablesRoot);
+                table.transform.position = new Vector3(centre.x, 0, centre.z);
+                var outer = new CustomerSeat[2];
+                var inner = new CustomerSeat[2];
+                for (var bench = 0; bench < 2; bench++)
+                {
+                    var side = bench == 0 ? -1f : 1f; // bench 0 is on the -Z end and faces +Z
+                    var facing = Quaternion.Euler(0, bench == 0 ? 0 : 180, 0);
+                    var rootZ = centre.z + side * (BenchOffset - HipsBehindRoot);
+                    var approach = new Vector3(centre.x + aisle * AisleOffset, 0, centre.z + side * 0.45f);
+                    outer[bench] = Seat(table, $"Bench {bench + 1} aisle", approach,
+                        new Vector3(centre.x + aisle * SeatSideOffset, 0, rootZ), facing);
+                    inner[bench] = Seat(table, $"Bench {bench + 1} wall", approach,
+                        new Vector3(centre.x - aisle * SeatSideOffset, 0, rootZ), facing);
+                    inner[bench].blockedBy = outer[bench];
+                }
+                // Aisle seats first: pairs face each other; larger parties also use the wall seats.
+                table.seats = new[] { outer[0], outer[1], inner[0], inner[1] };
+                tables.Add(table);
+                seats.AddRange(table.seats);
+            }
+            system.tables = tables.ToArray();
+            system.seats = seats.ToArray();
+        }
+
+        static CustomerSeat Seat(CafeTable table, string name, Vector3 approach, Vector3 sit, Quaternion facing)
+        {
+            var seat = new GameObject(name).AddComponent<CustomerSeat>();
+            seat.transform.SetParent(table.transform);
+            seat.table = table;
+            seat.approach = Marker("Approach", approach, seat.transform);
+            seat.sittingPose = Marker("Sitting pose", sit, seat.transform);
+            seat.sittingPose.rotation = facing;
+            return seat;
+        }
+
+        static void EnsureCharacterPrefabs()
+        {
+            foreach (var c in CharacterPreviewSetup.Characters)
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(CharacterPreviewSetup.PrefabPath(c));
+                var animator = prefab != null ? prefab.GetComponentInChildren<Animator>() : null;
+                if (animator == null || !animator.isHuman) { CharacterPreviewSetup.Build(false); return; }
+            }
+        }
+
+        static void ConfigureCharacters(CafeCustomerSystem system)
+        {
+            var prefabs = new List<GameObject>();
+            foreach (var c in CharacterPreviewSetup.Characters)
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(CharacterPreviewSetup.PrefabPath(c));
+                if (prefab != null) prefabs.Add(prefab);
+            }
+            system.characterPrefabs = prefabs.ToArray();
         }
 
         static NavMeshBuildSource Box(Bounds bounds, int area) => new NavMeshBuildSource
