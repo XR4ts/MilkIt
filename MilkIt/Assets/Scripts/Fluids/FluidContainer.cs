@@ -44,7 +44,7 @@ namespace MilkIt.Fluids
         public float maxPourRate = 250f;
 
         [Header("Visual")]
-        [Tooltip("Show a simple fill-level cylinder inside the container.")]
+        [Tooltip("Show the liquid inside the container. Its surface stays level when the container tilts.")]
         public bool showFill = true;
 
         [Header("Events")]
@@ -62,6 +62,9 @@ namespace MilkIt.Fluids
         float lastSubmergedTime = -10f;
         FluidStream stream;
         MeshRenderer fillRenderer;
+        FluidFillMesh fillMesh;
+        Vector3 fillGravity;
+        bool fillDirty = true;
 
         public Transform Opening => opening != null ? opening : transform;
         public IReadOnlyList<FluidLayer> Layers => layers;
@@ -83,7 +86,11 @@ namespace MilkIt.Fluids
 
         void OnEnable() => All.Add(this);
         void OnDisable() => All.Remove(this);
-        void Start() => UpdateFillVisual();
+
+        void OnDestroy()
+        {
+            if (fillMesh != null) Destroy(fillMesh.Mesh);
+        }
 
         // ---------------------------------------------------------------- queries
 
@@ -195,7 +202,7 @@ namespace MilkIt.Fluids
         {
             onContentsChanged.Invoke();
             ContentsChanged?.Invoke(this);
-            UpdateFillVisual();
+            fillDirty = true;
         }
 
         // ---------------------------------------------------------------- pouring and spilling
@@ -205,10 +212,14 @@ namespace MilkIt.Fluids
 
         void Update()
         {
-            if (!canPour || total <= 0f) return;
-            if (Time.time - lastSubmergedTime < 0.1f) return;
+            if (total <= 0f) return;
 
-            float excess = total - MaxFillAtTilt(Opening.up.y) * capacity;
+            // Gravity as seen from the container: tells how far, and towards which side, it is tilted.
+            Vector3 gravity = Opening.InverseTransformDirection(Vector3.down);
+            if ((gravity - fillGravity).sqrMagnitude > 1e-6f) fillDirty = true;
+
+            if (!canPour || Time.time - lastSubmergedTime < 0.1f) return;
+            float excess = total - MaxFillAtTilt(-gravity.y) * capacity;
             if (excess <= 0.01f) return;
 
             // Drain faster the further past the spill point it is tilted, limited by the opening.
@@ -219,18 +230,23 @@ namespace MilkIt.Fluids
             RemoveMix(amount, s);
         }
 
+        void LateUpdate()
+        {
+            if (!fillDirty) return;
+            fillDirty = false;
+            UpdateFillVisual();
+        }
+
         /// <summary>
-        /// Largest fill fraction the container can hold at this tilt before the surface reaches the rim.
-        /// cosTilt is the dot product of the opening's up axis with world up.
+        /// Largest fill fraction the container can hold at this tilt: the volume below a level surface
+        /// that just touches the lowest point of the rim. cosTilt is the opening's up axis dotted with world up.
         /// </summary>
         float MaxFillAtTilt(float cosTilt)
         {
             if (cosTilt >= 0.9999f) return 1f;
             if (cosTilt <= 0.02f) return 0f;
-            float tan = Mathf.Sqrt(1f - cosTilt * cosTilt) / cosTilt;
-            float a = openingRadius * tan / Mathf.Max(depth, 0.0001f);
-            float f = 1f - a;                       // surface still covers the whole bottom
-            return f >= 0.5f ? f : 1f / (4f * a);   // otherwise a wedge in the lower corner
+            float sin = Mathf.Sqrt(1f - cosTilt * cosTilt);
+            return FluidFillMesh.FractionBelow(FluidFillMesh.RimHeight(openingRadius, sin), openingRadius, depth, sin, cosTilt);
         }
 
         /// <summary>Lowest point of the rim: where fluid leaves the container.</summary>
@@ -263,19 +279,29 @@ namespace MilkIt.Fluids
         void UpdateFillVisual()
         {
             if (!Application.isPlaying) return;
-            bool show = showFill && !isDrain && total > 0f;
+            Vector3 gravity = Opening.InverseTransformDirection(Vector3.down);
+            fillGravity = gravity;
+            float cos = -gravity.y;
+
+            // Past roughly horizontal there is nothing left inside to show.
+            bool show = showFill && !isDrain && total > 0f && cos > 0.03f;
             if (!show)
             {
                 if (fillRenderer != null) fillRenderer.enabled = false;
                 return;
             }
-            if (fillRenderer == null) fillRenderer = FluidVisuals.CreateCylinder("Fluid Fill", Opening);
+            if (fillRenderer == null)
+            {
+                fillMesh = new FluidFillMesh();
+                fillRenderer = FluidVisuals.CreateRenderer("Fluid Fill", Opening, fillMesh.Mesh);
+            }
 
-            float height = FillFraction * depth * 0.98f;
-            float diameter = openingRadius * 2f * 0.97f;
-            Transform t = fillRenderer.transform;
-            t.localPosition = new Vector3(0f, -depth + height * 0.5f, 0f);
-            t.localScale = new Vector3(diameter, height * 0.5f, diameter);
+            float sin = Mathf.Sqrt(Mathf.Max(0f, 1f - cos * cos));
+            var lowSide = new Vector2(gravity.x, gravity.z);
+            lowSide = sin > 0.0001f ? lowSide / lowSide.magnitude : Vector2.right;
+            float height = FluidFillMesh.SolveHeight(FillFraction, openingRadius, depth, sin, cos);
+            fillMesh.Rebuild(openingRadius * 0.97f, depth, height, sin, cos, lowSide);
+
             fillRenderer.enabled = true;
             FluidVisuals.Apply(fillRenderer, FluidMix.Blend(layers, out FluidType dominant), dominant);
         }

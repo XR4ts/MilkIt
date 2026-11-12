@@ -79,11 +79,13 @@ namespace MilkIt.Fluids
             return m;
         }
 
-        public static MeshRenderer CreateCylinder(string name, Transform parent)
+        public static MeshRenderer CreateCylinder(string name, Transform parent) => CreateRenderer(name, parent, Cylinder);
+
+        public static MeshRenderer CreateRenderer(string name, Transform parent, Mesh mesh)
         {
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
-            go.AddComponent<MeshFilter>().sharedMesh = Cylinder;
+            go.AddComponent<MeshFilter>().sharedMesh = mesh;
             var r = go.AddComponent<MeshRenderer>();
             r.shadowCastingMode = ShadowCastingMode.Off;
             r.sharedMaterial = MaterialFor(null);

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.XR.CoreUtils;
 using UnityEngine;
 
 namespace MilkIt.Fluids
@@ -12,7 +13,7 @@ namespace MilkIt.Fluids
     {
         [Tooltip("Container this stream comes out of; never chosen as its own target.")]
         public FluidContainer owner;
-        [Tooltip("What the stream can land on.")]
+        [Tooltip("What the stream can land on. Movable objects (rigidbodies, the player rig, containers) and steep surfaces are always skipped: fluid runs off them to the fixed surface below.")]
         public LayerMask obstacles = ~0;
         public float maxDistance = 5f;
         [Tooltip("m/s. Only affects thickness: thickness comes from flow rate divided by this speed.")]
@@ -20,7 +21,7 @@ namespace MilkIt.Fluids
         [Tooltip("m/s. How fast the stream's tip drops when a pour starts.")]
         public float fallSpeed = 4f;
 
-        static readonly RaycastHit[] Hits = new RaycastHit[8];
+        static readonly RaycastHit[] Hits = new RaycastHit[16];
 
         readonly List<FluidLayer> pending = new List<FluidLayer>();
         Vector3 origin;
@@ -68,7 +69,7 @@ namespace MilkIt.Fluids
 
             // Where does it land?
             FluidContainer target = FindReceiver();
-            bool hasHit = FindObstacle(target, out RaycastHit hit);
+            bool hasHit = FindObstacle(out RaycastHit hit);
             float endY;
             if (target != null && (!hasHit || hit.distance >= origin.y - target.Opening.position.y - 0.005f))
             {
@@ -113,8 +114,11 @@ namespace MilkIt.Fluids
             return best;
         }
 
-        /// <summary>Nearest collider below the origin, ignoring the emitter itself and the receiving container.</summary>
-        bool FindObstacle(FluidContainer target, out RaycastHit nearest)
+        /// <summary>
+        /// Nearest surface below the origin that fluid can settle on. Skips the emitter itself, and anything
+        /// fluid would run off: movable objects, the player rig, containers, and steep faces.
+        /// </summary>
+        bool FindObstacle(out RaycastHit nearest)
         {
             nearest = default;
             int count = Physics.RaycastNonAlloc(origin, Vector3.down, Hits, maxDistance, obstacles, QueryTriggerInteraction.Ignore);
@@ -123,12 +127,19 @@ namespace MilkIt.Fluids
             {
                 Transform t = Hits[i].collider.transform;
                 if (t.IsChildOf(transform)) continue;
-                if (target != null && t.IsChildOf(target.transform)) continue;
+                if (!CanSettleOn(Hits[i])) continue;
                 if (found && Hits[i].distance >= nearest.distance) continue;
                 nearest = Hits[i];
                 found = true;
             }
             return found;
+        }
+
+        static bool CanSettleOn(RaycastHit hit)
+        {
+            Collider c = hit.collider;
+            if (hit.normal.y < 0.5f || c.attachedRigidbody != null) return false;
+            return c.GetComponentInParent<FluidContainer>() == null && c.GetComponentInParent<XROrigin>() == null;
         }
 
         void UpdateVisual(float length, Color color, FluidType dominant)

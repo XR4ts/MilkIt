@@ -6,14 +6,15 @@ namespace MilkIt.Fluids
 {
     /// <summary>
     /// Owns every puddle. One per scene; created automatically with default settings if missing.
-    /// Puddles fade by default; set 'permanent' to keep them until CleanAt/CleanAll/FluidPuddle.CleanUp is called.
+    /// Puddles fade after 'lifetime' seconds. Turn 'fadeEnabled' off (or call SetFadeEnabled / ToggleFade) to keep
+    /// every puddle until it is cleaned with a FluidRag, CleanAt, CleanAll or FluidPuddle.CleanUp.
     /// </summary>
     public class FluidSpillManager : MonoBehaviour
     {
-        [Tooltip("Puddles stay until cleaned up instead of fading.")]
-        public bool permanent;
+        [Tooltip("The fade timer for all puddles. Off = puddles stay until cleaned up.")]
+        public bool fadeEnabled = true;
         [Tooltip("Seconds a puddle stays after the last drop landed on it.")]
-        public float lifetime = 30f;
+        public float lifetime = 10f;
         public float fadeDuration = 3f;
         [Min(1), Tooltip("Oldest fading puddle is reused beyond this.")]
         public int maxPuddles = 24;
@@ -37,6 +38,9 @@ namespace MilkIt.Fluids
 
         public IReadOnlyList<FluidPuddle> Puddles => active;
 
+        /// <summary>The manager if there is one, without creating it.</summary>
+        public static FluidSpillManager Existing => instance;
+
         public static FluidSpillManager Instance
         {
             get
@@ -51,6 +55,11 @@ namespace MilkIt.Fluids
         {
             if (instance == null) instance = this;
         }
+
+        /// <summary>Turns the fade timer for all puddles on or off. Timers pause while off.</summary>
+        public void SetFadeEnabled(bool enabled) => fadeEnabled = enabled;
+
+        public void ToggleFade() => fadeEnabled = !fadeEnabled;
 
         public void AddSpill(Vector3 point, Vector3 normal, FluidType type, float ml)
         {
@@ -84,7 +93,7 @@ namespace MilkIt.Fluids
         {
             float dt = Time.deltaTime;
             for (int i = active.Count - 1; i >= 0; i--)
-                if (!active[i].Tick(dt)) Remove(active[i], false);
+                if (!active[i].Tick(dt, fadeEnabled)) Remove(active[i], false);
         }
 
         FluidPuddle FindNear(Vector3 point)
@@ -107,10 +116,10 @@ namespace MilkIt.Fluids
         {
             if (active.Count >= maxPuddles)
             {
-                // Reuse the oldest puddle that is allowed to disappear; if all are permanent, grow the nearest one.
+                // Reuse the oldest puddle that is allowed to disappear; if none may (fade off or all permanent), grow the nearest one.
                 FluidPuddle oldest = null;
                 for (int i = 0; i < active.Count && oldest == null; i++)
-                    if (!active[i].permanent) oldest = active[i];
+                    if (fadeEnabled && !active[i].permanent) oldest = active[i];
                 if (oldest == null) return Nearest(point);
                 Remove(oldest, false);
             }
