@@ -3,11 +3,6 @@ using UnityEngine.Events;
 
 namespace MilkIt.Fluids
 {
-    /// <summary>
-    /// Produces fluid at a spout: a tap, an espresso machine's group head, a syrup pump.
-    /// Infinite by default. StartFlow/StopFlow/Toggle run it continuously; Dispense produces a
-    /// fixed dose per signal. Optionally it uses up a supply container (water tank -> coffee).
-    /// </summary>
     public class FluidSource : MonoBehaviour
     {
         [Header("Output")]
@@ -47,7 +42,6 @@ namespace MilkIt.Fluids
             if (startOn) StartFlow();
         }
 
-        /// <summary>Run until stopped.</summary>
         public void StartFlow() => Begin(float.PositiveInfinity);
 
         public void StopFlow()
@@ -63,13 +57,10 @@ namespace MilkIt.Fluids
             else StartFlow();
         }
 
-        /// <summary>Produce one dose (doseAmount), then stop.</summary>
         public void Dispense() => Begin(doseAmount);
 
-        /// <summary>Produce up to this many ml, then stop.</summary>
         public void DispenseAmount(float ml) => Begin(ml);
 
-        /// <summary>0..1 multiplier on the flow rate, e.g. from a tap handle or knob.</summary>
         public void SetFlowScale(float value) => flowScale = Mathf.Clamp01(value);
 
         void Begin(float amount)

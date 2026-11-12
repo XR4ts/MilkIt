@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace MilkIt.Fluids
 {
-    /// <summary>
-    /// Makes a source scoopable: a box of material (bag of coffee grains, full sink) that fills any
-    /// scoopable container whose opening is dipped inside it. Infinite.
-    /// </summary>
     public class FluidScoopZone : MonoBehaviour
     {
         public FluidType fluidType;

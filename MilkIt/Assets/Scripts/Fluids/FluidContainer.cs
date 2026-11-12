@@ -5,14 +5,8 @@ using UnityEngine.Events;
 
 namespace MilkIt.Fluids
 {
-    /// <summary>
-    /// Anything that holds fluid: a cup, a machine's water tank, a drain, a trash can.
-    /// Tracks how much of each material it holds (in pour order), pours out when tilted,
-    /// and spills whatever it cannot take.
-    /// </summary>
     public class FluidContainer : MonoBehaviour
     {
-        /// <summary>All enabled containers. Streams and scoop zones search this instead of using physics.</summary>
         public static readonly List<FluidContainer> All = new List<FluidContainer>();
 
         [Header("Contents")]
@@ -75,7 +69,6 @@ namespace MilkIt.Fluids
         public float WorldRadius => openingRadius * Opening.lossyScale.x;
         public float WorldDepth => depth * Opening.lossyScale.y;
 
-        /// <summary>World height where a stream falling into this container should end.</summary>
         public float SurfaceWorldY => Opening.position.y - WorldDepth * (isDrain ? 1f : 1f - FillFraction);
 
         void Awake()
@@ -92,8 +85,6 @@ namespace MilkIt.Fluids
             if (fillMesh != null) Destroy(fillMesh.Mesh);
         }
 
-        // ---------------------------------------------------------------- queries
-
         public float GetAmount(FluidType type)
         {
             for (int i = 0; i < layers.Count; i++)
@@ -101,18 +92,13 @@ namespace MilkIt.Fluids
             return 0f;
         }
 
-        /// <summary>Share of the container's capacity taken by this material (0..1).</summary>
         public float GetFractionOfCapacity(FluidType type) => capacity > 0f ? GetAmount(type) / capacity : 0f;
 
-        /// <summary>Share of the current contents made up by this material (0..1).</summary>
         public float GetFractionOfContents(FluidType type) => total > 0f ? GetAmount(type) / total : 0f;
 
         public bool Accepts(FluidType type) =>
             type != null && (acceptedTypes == null || acceptedTypes.Count == 0 || acceptedTypes.Contains(type));
 
-        // ---------------------------------------------------------------- changing contents
-
-        /// <summary>Something poured in from above. Whatever does not fit or is not accepted is spilled over the rim.</summary>
         public void Receive(FluidType type, float ml)
         {
             if (type == null || ml <= 0f) return;
@@ -130,7 +116,6 @@ namespace MilkIt.Fluids
             if (ml - accepted > 0.0001f) Spill(type, ml - accepted);
         }
 
-        /// <summary>Adds up to the free capacity without spilling. Returns the amount actually added.</summary>
         public float Add(FluidType type, float ml)
         {
             if (type == null || ml <= 0f || isDrain) return 0f;
@@ -144,10 +129,8 @@ namespace MilkIt.Fluids
             return accepted;
         }
 
-        /// <summary>Removes an amount of the mix, taking every material proportionally. Returns the amount removed.</summary>
         public float Remove(float ml) => RemoveMix(ml, null);
 
-        /// <summary>Removes an amount of one material. Returns the amount removed.</summary>
         public float Remove(FluidType type, float ml)
         {
             for (int i = 0; i < layers.Count; i++)
@@ -205,16 +188,12 @@ namespace MilkIt.Fluids
             fillDirty = true;
         }
 
-        // ---------------------------------------------------------------- pouring and spilling
-
-        /// <summary>Called by scoop zones while the opening is under their surface; stops it pouring back out.</summary>
         public void MarkSubmerged() => lastSubmergedTime = Time.time;
 
         void Update()
         {
             if (total <= 0f) return;
 
-            // Gravity as seen from the container: tells how far, and towards which side, it is tilted.
             Vector3 gravity = Opening.InverseTransformDirection(Vector3.down);
             if ((gravity - fillGravity).sqrMagnitude > 1e-6f) fillDirty = true;
 
@@ -222,7 +201,6 @@ namespace MilkIt.Fluids
             float excess = total - MaxFillAtTilt(-gravity.y) * capacity;
             if (excess <= 0.01f) return;
 
-            // Drain faster the further past the spill point it is tilted, limited by the opening.
             float rate = Mathf.Min(maxPourRate, Mathf.Max(excess * 6f, 15f));
             float amount = Mathf.Min(excess, rate * Time.deltaTime);
             FluidStream s = GetStream();
@@ -237,10 +215,6 @@ namespace MilkIt.Fluids
             UpdateFillVisual();
         }
 
-        /// <summary>
-        /// Largest fill fraction the container can hold at this tilt: the volume below a level surface
-        /// that just touches the lowest point of the rim. cosTilt is the opening's up axis dotted with world up.
-        /// </summary>
         float MaxFillAtTilt(float cosTilt)
         {
             if (cosTilt >= 0.9999f) return 1f;
@@ -249,7 +223,6 @@ namespace MilkIt.Fluids
             return FluidFillMesh.FractionBelow(FluidFillMesh.RimHeight(openingRadius, sin), openingRadius, depth, sin, cosTilt);
         }
 
-        /// <summary>Lowest point of the rim: where fluid leaves the container.</summary>
         Vector3 RimPoint()
         {
             Transform o = Opening;
@@ -273,8 +246,6 @@ namespace MilkIt.Fluids
             if (stream == null) stream = FluidStream.Create(gameObject, this);
             return stream;
         }
-
-        // ---------------------------------------------------------------- visuals
 
         void UpdateFillVisual()
         {

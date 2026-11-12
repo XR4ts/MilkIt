@@ -4,7 +4,6 @@ using UnityEngine.Events;
 
 namespace MilkIt.Fluids
 {
-    /// <summary>A spill on a surface: a puddle of liquid or a pile of grains. Created and pooled by FluidSpillManager.</summary>
     public class FluidPuddle : MonoBehaviour
     {
         [Tooltip("This puddle never fades, even while the manager's fade timer is on.")]
@@ -18,7 +17,6 @@ namespace MilkIt.Fluids
         float volume, age, scrub, radius, thickness;
 
         public IReadOnlyList<FluidLayer> Layers => layers;
-        /// <summary>ml.</summary>
         public float Volume => volume;
         public float Radius => radius;
 
@@ -48,7 +46,6 @@ namespace MilkIt.Fluids
             FluidVisuals.Apply(visual, color, dominant);
         }
 
-        /// <summary>Grows towards its size, fades when old. Returns false once it has faded away.</summary>
         internal bool Tick(float dt, bool fadeEnabled)
         {
             float target = Mathf.Min(Mathf.Sqrt(volume * 1e-6f / (Mathf.PI * thickness)), manager.maxRadius);
@@ -60,7 +57,6 @@ namespace MilkIt.Fluids
                 if (over > 0f) fade = manager.fadeDuration > 0f ? over / manager.fadeDuration : 1f;
                 if (fade >= 1f) return false;
             }
-            // Shrinks as it fades, and as it is scrubbed, so rubbing shows progress.
             target *= (1f - fade) * (1f - 0.6f * scrub);
             radius = Mathf.MoveTowards(radius, target, manager.spreadSpeed * dt);
             Transform t = visual.transform;
@@ -69,13 +65,8 @@ namespace MilkIt.Fluids
             return true;
         }
 
-        /// <summary>How far along it is to being scrubbed away (0..1).</summary>
         public float ScrubProgress => scrub;
 
-        /// <summary>
-        /// Adds scrubbing progress (1 = fully cleaned). A rag calls this every frame it is rubbed over the puddle.
-        /// Returns true when the puddle has been cleaned away.
-        /// </summary>
         public bool Scrub(float progress)
         {
             scrub += Mathf.Max(progress, 0f);
@@ -84,13 +75,11 @@ namespace MilkIt.Fluids
             return true;
         }
 
-        /// <summary>Removes the whole puddle (a mop, a cloth, a cleaning event).</summary>
         public void CleanUp()
         {
             if (manager != null) manager.Remove(this, true);
         }
 
-        /// <summary>Removes part of the puddle. Returns the ml removed; the puddle disappears when nothing is left.</summary>
         public float Clean(float ml)
         {
             ml = Mathf.Min(ml, volume);

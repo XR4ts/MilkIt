@@ -2,24 +2,18 @@ using UnityEngine;
 
 namespace MilkIt.Fluids
 {
-    /// <summary>
-    /// The liquid inside a cylindrical container: a cylinder cut by a level surface, so the liquid
-    /// stays horizontal while the container tilts. Works in the opening's local space
-    /// (rim at y = 0, bottom at y = -depth).
-    /// </summary>
     internal sealed class FluidFillMesh
     {
         const int Sides = 24;
         const int Rings = 5;
         const int Samples = 32;
 
-        // Vertex layout.
         const int SurfaceCenter = 0;
-        const int SurfaceRings = 1;                              // Rings * Sides
-        const int SideBottom = SurfaceRings + Rings * Sides;     // Sides
-        const int SideTop = SideBottom + Sides;                  // Sides
+        const int SurfaceRings = 1;
+        const int SideBottom = SurfaceRings + Rings * Sides;
+        const int SideTop = SideBottom + Sides;
         const int CapCenter = SideTop + Sides;
-        const int CapRing = CapCenter + 1;                       // Sides
+        const int CapRing = CapCenter + 1;
         const int VertexCount = CapRing + Sides;
 
         static readonly float[] Cos = new float[Sides];
@@ -51,7 +45,6 @@ namespace MilkIt.Fluids
             {
                 int j = (i + 1) % Sides;
 
-                // Surface: fan to the first ring, then quads between rings. Faces up.
                 triangles[t++] = SurfaceCenter;
                 triangles[t++] = SurfaceRings + j;
                 triangles[t++] = SurfaceRings + i;
@@ -62,11 +55,9 @@ namespace MilkIt.Fluids
                     triangles[t++] = inner + i; triangles[t++] = inner + j; triangles[t++] = outer + j;
                 }
 
-                // Side wall. Faces outwards.
                 triangles[t++] = SideBottom + i; triangles[t++] = SideTop + i; triangles[t++] = SideTop + j;
                 triangles[t++] = SideBottom + i; triangles[t++] = SideTop + j; triangles[t++] = SideBottom + j;
 
-                // Bottom cap. Faces down.
                 triangles[t++] = CapCenter; triangles[t++] = CapRing + i; triangles[t++] = CapRing + j;
 
                 normals[SideBottom + i] = normals[SideTop + i] = new Vector3(Cos[i], 0f, Sin[i]);
@@ -79,10 +70,6 @@ namespace MilkIt.Fluids
             Mesh.triangles = triangles;
         }
 
-        /// <summary>
-        /// Rebuilds the liquid shape. The surface is the plane  -sin * u + cos * y = height, where u is the
-        /// distance along 'lowSide' (the horizontal direction, in local x/z, towards the lowest point of the rim).
-        /// </summary>
         public void Rebuild(float radius, float depth, float height, float sin, float cos, Vector2 lowSide)
         {
             var surfaceNormal = new Vector3(-sin * lowSide.x, cos, -sin * lowSide.y);
@@ -112,10 +99,8 @@ namespace MilkIt.Fluids
             Mesh.bounds = new Bounds(new Vector3(0f, -depth * 0.5f, 0f), new Vector3(radius * 2f, depth, radius * 2f));
         }
 
-        /// <summary>Share of the cylinder's volume (0..1) lying below the surface plane at this height.</summary>
         public static float FractionBelow(float height, float radius, float depth, float sin, float cos)
         {
-            // Integrate the liquid column height across the cylinder, along the tilt direction.
             // Substituting u = radius * sin(phi) keeps the integrand smooth, so few samples are needed.
             float sum = 0f;
             const float Step = Mathf.PI / Samples;
@@ -129,10 +114,8 @@ namespace MilkIt.Fluids
             return Mathf.Clamp01(sum * Step * 2f / (Mathf.PI * depth));
         }
 
-        /// <summary>Surface height at which the rim's lowest point is just touched; anything above pours out.</summary>
         public static float RimHeight(float radius, float sin) => -sin * radius;
 
-        /// <summary>Surface height that holds this share of the cylinder's volume, never above the rim's lowest point.</summary>
         public static float SolveHeight(float fraction, float radius, float depth, float sin, float cos)
         {
             float hi = RimHeight(radius, sin);

@@ -3,7 +3,6 @@ using UnityEngine.Rendering;
 
 namespace MilkIt.Fluids
 {
-    /// <summary>Shared mesh/material helpers so every stream, fill level and puddle is one cheap cylinder.</summary>
     internal static class FluidVisuals
     {
         static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
@@ -11,7 +10,6 @@ namespace MilkIt.Fluids
         static Material liquidFallback, granularFallback;
         static MaterialPropertyBlock block;
 
-        /// <summary>Cylinder with radius 0.5 and height 2, so localScale = (diameter, height / 2, diameter).</summary>
         public static Mesh Cylinder
         {
             get

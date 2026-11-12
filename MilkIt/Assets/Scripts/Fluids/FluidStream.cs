@@ -4,11 +4,6 @@ using UnityEngine;
 
 namespace MilkIt.Fluids
 {
-    /// <summary>
-    /// A pour: falls straight down from an origin as a cylinder and delivers its volume to the
-    /// container opening below, or to a puddle where it lands. Emitters (sources, containers)
-    /// call SetOrigin + Add each frame they pour; the stream does the rest in LateUpdate.
-    /// </summary>
     public class FluidStream : MonoBehaviour
     {
         [Tooltip("Container this stream comes out of; never chosen as its own target.")]
@@ -67,7 +62,6 @@ namespace MilkIt.Fluids
 
             Color color = FluidMix.Blend(pending, out FluidType dominant);
 
-            // Where does it land?
             FluidContainer target = FindReceiver();
             bool hasHit = FindObstacle(out RaycastHit hit);
             float endY;
@@ -84,14 +78,13 @@ namespace MilkIt.Fluids
             }
             else
             {
-                endY = origin.y - maxDistance; // fell out of the world
+                endY = origin.y - maxDistance;
             }
             pending.Clear();
 
             UpdateVisual(origin.y - endY, color, dominant);
         }
 
-        /// <summary>Highest upward-facing opening directly below the origin.</summary>
         FluidContainer FindReceiver()
         {
             FluidContainer best = null;
@@ -114,10 +107,6 @@ namespace MilkIt.Fluids
             return best;
         }
 
-        /// <summary>
-        /// Nearest surface below the origin that fluid can settle on. Skips the emitter itself, and anything
-        /// fluid would run off: movable objects, the player rig, containers, and steep faces.
-        /// </summary>
         bool FindObstacle(out RaycastHit nearest)
         {
             nearest = default;
@@ -149,7 +138,6 @@ namespace MilkIt.Fluids
             length = Mathf.Max(length, 0f);
             visibleLength = Mathf.Min(length, visibleLength + fallSpeed * Time.deltaTime);
 
-            // Cross-section = volume per second / speed. 1 ml = 1e-6 m3.
             float area = smoothedRate * 1e-6f / Mathf.Max(flowSpeed, 0.01f);
             float diameter = 2f * Mathf.Sqrt(area / Mathf.PI);
             if (dominant != null && dominant.IsGranular) diameter *= 1.5f;

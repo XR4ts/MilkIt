@@ -4,10 +4,6 @@ using UnityEngine.Events;
 
 namespace MilkIt.Fluids
 {
-    /// <summary>
-    /// A cloth that cleans spills. Touching a puddle is not enough: it has to be rubbed back and forth
-    /// over it for 'scrubTime' seconds in total. Put it on any grabbable object.
-    /// </summary>
     public class FluidRag : MonoBehaviour
     {
         [Tooltip("Seconds of rubbing needed to clean one puddle.")]
@@ -48,7 +44,6 @@ namespace MilkIt.Fluids
                 float touch = radius + puddle.Radius;
                 if ((offset - normal * height).sqrMagnitude > touch * touch) continue;
 
-                // Only movement along the surface counts as rubbing.
                 Vector3 slide = move - normal * Vector3.Dot(move, normal);
                 if (slide.magnitude < minRubSpeed * dt) continue;
 

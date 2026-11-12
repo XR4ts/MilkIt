@@ -4,11 +4,6 @@ using UnityEngine.Events;
 
 namespace MilkIt.Fluids
 {
-    /// <summary>
-    /// Owns every puddle. One per scene; created automatically with default settings if missing.
-    /// Puddles fade after 'lifetime' seconds. Turn 'fadeEnabled' off (or call SetFadeEnabled / ToggleFade) to keep
-    /// every puddle until it is cleaned with a FluidRag, CleanAt, CleanAll or FluidPuddle.CleanUp.
-    /// </summary>
     public class FluidSpillManager : MonoBehaviour
     {
         [Tooltip("The fade timer for all puddles. Off = puddles stay until cleaned up.")]
@@ -38,7 +33,6 @@ namespace MilkIt.Fluids
 
         public IReadOnlyList<FluidPuddle> Puddles => active;
 
-        /// <summary>The manager if there is one, without creating it.</summary>
         public static FluidSpillManager Existing => instance;
 
         public static FluidSpillManager Instance
@@ -56,7 +50,6 @@ namespace MilkIt.Fluids
             if (instance == null) instance = this;
         }
 
-        /// <summary>Turns the fade timer for all puddles on or off. Timers pause while off.</summary>
         public void SetFadeEnabled(bool enabled) => fadeEnabled = enabled;
 
         public void ToggleFade() => fadeEnabled = !fadeEnabled;
@@ -69,7 +62,6 @@ namespace MilkIt.Fluids
             puddle.Add(type, ml);
         }
 
-        /// <summary>Cleans every puddle touching a sphere, e.g. around a mop head. Returns how many were cleaned.</summary>
         public int CleanAt(Vector3 position, float radius)
         {
             int cleaned = 0;
@@ -116,7 +108,6 @@ namespace MilkIt.Fluids
         {
             if (active.Count >= maxPuddles)
             {
-                // Reuse the oldest puddle that is allowed to disappear; if none may (fade off or all permanent), grow the nearest one.
                 FluidPuddle oldest = null;
                 for (int i = 0; i < active.Count && oldest == null; i++)
                     if (fadeEnabled && !active[i].permanent) oldest = active[i];

@@ -4,7 +4,6 @@ namespace MilkIt.Fluids
 {
     public enum FluidState { Liquid, Granular }
 
-    /// <summary>A pourable material: water, coffee, coffee grains, milk...</summary>
     [CreateAssetMenu(menuName = "MilkIt/Fluid Type", fileName = "NewFluidType")]
     public class FluidType : ScriptableObject
     {

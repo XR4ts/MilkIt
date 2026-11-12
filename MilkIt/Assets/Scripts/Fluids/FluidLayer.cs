@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace MilkIt.Fluids
 {
-    /// <summary>An amount (ml) of one material. Containers keep these in the order they were first poured in.</summary>
     [Serializable]
     public struct FluidLayer
     {
@@ -27,7 +26,6 @@ namespace MilkIt.Fluids
             return total;
         }
 
-        /// <summary>Adds to the existing layer of that type, or appends a new layer at the end.</summary>
         public static void Add(List<FluidLayer> layers, FluidType type, float amount)
         {
             for (int i = 0; i < layers.Count; i++)
@@ -39,7 +37,6 @@ namespace MilkIt.Fluids
             layers.Add(new FluidLayer(type, amount));
         }
 
-        /// <summary>Volume-weighted colour of a mix, plus the material with the largest share.</summary>
         public static Color Blend(List<FluidLayer> layers, out FluidType dominant)
         {
             dominant = null;
