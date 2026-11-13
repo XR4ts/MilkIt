@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.XR.Interaction.Toolkit.Locomotion.Comfort;
 
 public class WristMenuController : MonoBehaviour
 {
@@ -19,6 +20,11 @@ public class WristMenuController : MonoBehaviour
     [SerializeField] TMP_Text pauseButtonText;
     [SerializeField] Button resetButton;
     [SerializeField] Button settingsButton;
+    [Header("Settings")]
+    [SerializeField] Toggle vignetteToggle;
+    [Tooltip("Optional. If empty, the first TunnelingVignetteController in the scene is used.")]
+    [SerializeField] TunnelingVignetteController vignette;
+
     [SerializeField] Button backFromSettingsButton;
     [SerializeField] Button quitButton;
 
@@ -30,6 +36,7 @@ public class WristMenuController : MonoBehaviour
     InputAction toggleAction;
     bool isOpen;
     bool isPaused;
+    const string VignettePrefKey = "Settings.VignetteEnabled";
 
     void Awake()
     {
@@ -43,6 +50,13 @@ public class WristMenuController : MonoBehaviour
         toggleAction.AddBinding("<XRController>{RightHand}/{MenuButton}");
         toggleAction.AddBinding("<Keyboard>/m");
         SetOpen(startOpen);
+
+        if (vignette == null)
+            vignette = FindFirstObjectByType<TunnelingVignetteController>(FindObjectsInactive.Include);
+
+        bool vignetteOn = PlayerPrefs.GetInt(VignettePrefKey, 1) == 1;
+        if (vignetteToggle) vignetteToggle.SetIsOnWithoutNotify(vignetteOn);
+        SetVignetteEnabled(vignetteOn);
     }
 
     void OnEnable()
@@ -54,6 +68,7 @@ public class WristMenuController : MonoBehaviour
         if (resetButton) resetButton.onClick.AddListener(ResetObjects);
         if (settingsButton) settingsButton.onClick.AddListener(OpenSettings);
         if (backFromSettingsButton) backFromSettingsButton.onClick.AddListener(CloseSettings);
+        if (vignetteToggle) vignetteToggle.onValueChanged.AddListener(SetVignetteEnabled);
         if (quitButton) quitButton.onClick.AddListener(QuitGame);
     }
 
@@ -66,6 +81,7 @@ public class WristMenuController : MonoBehaviour
         if (resetButton) resetButton.onClick.RemoveListener(ResetObjects);
         if (settingsButton) settingsButton.onClick.RemoveListener(OpenSettings);
         if (backFromSettingsButton) backFromSettingsButton.onClick.RemoveListener(CloseSettings);
+        if (vignetteToggle) vignetteToggle.onValueChanged.RemoveListener(SetVignetteEnabled);
         if (quitButton) quitButton.onClick.RemoveListener(QuitGame);
     }
 
@@ -126,6 +142,18 @@ public class WristMenuController : MonoBehaviour
         if (settingsPanel) settingsPanel.SetActive(false);
         if (mainButtonsPanel) mainButtonsPanel.SetActive(true);
     }
+
+    public void SetVignetteEnabled(bool enabled)
+    {
+        PlayerPrefs.SetInt(VignettePrefKey, enabled ? 1 : 0);
+        PlayerPrefs.Save();
+
+        if (vignette != null)
+            vignette.gameObject.SetActive(enabled);
+        else
+            Debug.LogWarning("WristMenuController: no TunnelingVignetteController found in scene.");
+    }
+
 
     public void QuitGame()
     {
