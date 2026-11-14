@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Comfort;
 using UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets;
+using MilkIt.Fluids;
 
 
 public class WristMenuController : MonoBehaviour
@@ -22,6 +23,7 @@ public class WristMenuController : MonoBehaviour
     [SerializeField] TMP_Text pauseButtonText;
     [SerializeField] Button resetButton;
     [SerializeField] Button settingsButton;
+
     [Header("Settings")]
     [SerializeField] Toggle vignetteToggle;
     [Tooltip("Optional. If empty, the first TunnelingVignetteController in the scene is used.")]
@@ -30,8 +32,15 @@ public class WristMenuController : MonoBehaviour
     [SerializeField] Toggle smoothTurnToggle;
     [Tooltip("Optional. If empty, all ControllerInputActionManagers in the scene are used.")]
     [SerializeField] ControllerInputActionManager[] controllerManagers;
-
     const string SmoothTurnPrefKey = "Settings.SmoothTurn";
+    [SerializeField] Slider puddleSlider;
+    [SerializeField] TMP_Text puddleLabel;
+    [Tooltip("Fade-out time used by the 'Vanish' setting, in seconds.")]
+    [SerializeField] float vanishFadeDuration = 0.5f;
+    const string PuddleModePrefKey = "Settings.PuddleMode";
+    const int PuddleVanish = 0, PuddleTimed = 1, PuddleStay = 2;
+    FluidSpillManager spillManager;
+    float defaultPuddleLifetime, defaultPuddleFadeDuration;
 
     [SerializeField] Button backFromSettingsButton;
     [SerializeField] Button quitButton;
@@ -73,6 +82,13 @@ public class WristMenuController : MonoBehaviour
         if (smoothTurnToggle) smoothTurnToggle.SetIsOnWithoutNotify(smoothTurnOn);
         SetSmoothTurn(smoothTurnOn);
 
+        spillManager = FluidSpillManager.Instance;
+        defaultPuddleLifetime = spillManager.lifetime;
+        defaultPuddleFadeDuration = spillManager.fadeDuration;
+
+        int puddleMode = PlayerPrefs.GetInt(PuddleModePrefKey, PuddleTimed);
+        if (puddleSlider) puddleSlider.SetValueWithoutNotify(puddleMode);
+        SetPuddleMode(puddleMode);
     }
 
     void OnEnable()
@@ -86,6 +102,7 @@ public class WristMenuController : MonoBehaviour
         if (backFromSettingsButton) backFromSettingsButton.onClick.AddListener(CloseSettings);
         if (vignetteToggle) vignetteToggle.onValueChanged.AddListener(SetVignetteEnabled);
         if (smoothTurnToggle) smoothTurnToggle.onValueChanged.AddListener(SetSmoothTurn);
+        if (puddleSlider) puddleSlider.onValueChanged.AddListener(OnPuddleSliderChanged);
         if (quitButton) quitButton.onClick.AddListener(QuitGame);
     }
 
@@ -100,6 +117,7 @@ public class WristMenuController : MonoBehaviour
         if (backFromSettingsButton) backFromSettingsButton.onClick.RemoveListener(CloseSettings);
         if (vignetteToggle) vignetteToggle.onValueChanged.RemoveListener(SetVignetteEnabled);
         if (smoothTurnToggle) smoothTurnToggle.onValueChanged.RemoveListener(SetSmoothTurn);
+        if (puddleSlider) puddleSlider.onValueChanged.RemoveListener(OnPuddleSliderChanged);
         if (quitButton) quitButton.onClick.RemoveListener(QuitGame);
     }
 
@@ -187,6 +205,42 @@ public class WristMenuController : MonoBehaviour
             if (manager) manager.smoothTurnEnabled = smooth;
     }
 
+    void OnPuddleSliderChanged(float value) => SetPuddleMode(Mathf.RoundToInt(value));
+
+    public void SetPuddleMode(int mode)
+    {
+        mode = Mathf.Clamp(mode, PuddleVanish, PuddleStay);
+        PlayerPrefs.SetInt(PuddleModePrefKey, mode);
+        PlayerPrefs.Save();
+
+        if (spillManager != null)
+        {
+            switch (mode)
+            {
+                case PuddleVanish:
+                    spillManager.fadeEnabled = true;
+                    spillManager.lifetime = 0f;
+                    spillManager.fadeDuration = vanishFadeDuration;
+                    break;
+                case PuddleTimed:
+                    spillManager.fadeEnabled = true;
+                    spillManager.lifetime = defaultPuddleLifetime;
+                    spillManager.fadeDuration = defaultPuddleFadeDuration;
+                    break;
+                case PuddleStay:
+                    spillManager.fadeEnabled = false;
+                    break;
+            }
+        }
+
+        if (puddleLabel)
+            puddleLabel.text = mode switch
+            {
+                PuddleVanish => "Puddles: Vanish",
+                PuddleTimed => $"Puddles: Fade after {defaultPuddleLifetime:0}s",
+                _ => "Puddles: Stay",
+            };
+    }
 
     public void QuitGame()
     {
