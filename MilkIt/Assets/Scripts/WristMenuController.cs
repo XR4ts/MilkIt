@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Comfort;
+using UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets;
+
 
 public class WristMenuController : MonoBehaviour
 {
@@ -24,6 +26,12 @@ public class WristMenuController : MonoBehaviour
     [SerializeField] Toggle vignetteToggle;
     [Tooltip("Optional. If empty, the first TunnelingVignetteController in the scene is used.")]
     [SerializeField] TunnelingVignetteController vignette;
+    const string VignettePrefKey = "Settings.VignetteEnabled";
+    [SerializeField] Toggle smoothTurnToggle;
+    [Tooltip("Optional. If empty, all ControllerInputActionManagers in the scene are used.")]
+    [SerializeField] ControllerInputActionManager[] controllerManagers;
+
+    const string SmoothTurnPrefKey = "Settings.SmoothTurn";
 
     [SerializeField] Button backFromSettingsButton;
     [SerializeField] Button quitButton;
@@ -36,7 +44,6 @@ public class WristMenuController : MonoBehaviour
     InputAction toggleAction;
     bool isOpen;
     bool isPaused;
-    const string VignettePrefKey = "Settings.VignetteEnabled";
 
     void Awake()
     {
@@ -57,6 +64,15 @@ public class WristMenuController : MonoBehaviour
         bool vignetteOn = PlayerPrefs.GetInt(VignettePrefKey, 1) == 1;
         if (vignetteToggle) vignetteToggle.SetIsOnWithoutNotify(vignetteOn);
         SetVignetteEnabled(vignetteOn);
+
+        if (controllerManagers == null || controllerManagers.Length == 0)
+            controllerManagers = FindObjectsByType<ControllerInputActionManager>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        bool smoothTurnOn = PlayerPrefs.GetInt(SmoothTurnPrefKey, 0) == 1; // default: snap
+        if (smoothTurnToggle) smoothTurnToggle.SetIsOnWithoutNotify(smoothTurnOn);
+        SetSmoothTurn(smoothTurnOn);
+
     }
 
     void OnEnable()
@@ -69,6 +85,7 @@ public class WristMenuController : MonoBehaviour
         if (settingsButton) settingsButton.onClick.AddListener(OpenSettings);
         if (backFromSettingsButton) backFromSettingsButton.onClick.AddListener(CloseSettings);
         if (vignetteToggle) vignetteToggle.onValueChanged.AddListener(SetVignetteEnabled);
+        if (smoothTurnToggle) smoothTurnToggle.onValueChanged.AddListener(SetSmoothTurn);
         if (quitButton) quitButton.onClick.AddListener(QuitGame);
     }
 
@@ -82,6 +99,7 @@ public class WristMenuController : MonoBehaviour
         if (settingsButton) settingsButton.onClick.RemoveListener(OpenSettings);
         if (backFromSettingsButton) backFromSettingsButton.onClick.RemoveListener(CloseSettings);
         if (vignetteToggle) vignetteToggle.onValueChanged.RemoveListener(SetVignetteEnabled);
+        if (smoothTurnToggle) smoothTurnToggle.onValueChanged.RemoveListener(SetSmoothTurn);
         if (quitButton) quitButton.onClick.RemoveListener(QuitGame);
     }
 
@@ -152,6 +170,21 @@ public class WristMenuController : MonoBehaviour
             vignette.gameObject.SetActive(enabled);
         else
             Debug.LogWarning("WristMenuController: no TunnelingVignetteController found in scene.");
+    }
+
+    public void SetSmoothTurn(bool smooth)
+    {
+        PlayerPrefs.SetInt(SmoothTurnPrefKey, smooth ? 1 : 0);
+        PlayerPrefs.Save();
+
+        if (controllerManagers == null || controllerManagers.Length == 0)
+        {
+            Debug.LogWarning("WristMenuController: no ControllerInputActionManager found in scene.");
+            return;
+        }
+
+        foreach (var manager in controllerManagers)
+            if (manager) manager.smoothTurnEnabled = smooth;
     }
 
 
