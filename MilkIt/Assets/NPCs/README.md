@@ -10,6 +10,9 @@ Open **MilkIt > NPCs > Open cafe with customers**, or **Assets/NPCs/Scenes/Cafe_
 - **Parties:** a party queues together, each member orders their own drink (one order ID each), the party sits at one table, chats while seated (SitTalk) and leaves together once everyone has finished. Wall-side seats go to the first arrivals so nobody slides past a seated friend.
 - **Seat choice:** an empty table first; otherwise, with **Share tables** on, free seats at a partly used table.
 - **Flow:** after ordering, customers leave the till westward along the counter, so they never meet the queue head-on in the narrow gap between the condiment bar and the queue rail.
+- **Patience:** once seated, each customer waits `patienceSeconds` (default 60, 0 = unlimited) for their drink. A marker above their head shows a cup icon and a bar that turns from green to red, with the seconds left; in the last `frustratedAt` (35%) the countdown turns red with a "!" (e.g. "! 4") and pulses, and they stop chatting. When it runs out they stand up and leave without paying (red "×"); friends at the table carry on.
+- **Payment:** customers pay only after finishing their drink (green "+price" popup). Prices are in `drinkPrices`, in the same order as `drinks` (`defaultPrice` otherwise). Patience and prices are plain fields so a level system can set them.
+- **Arrivals:** customers set off from the entrance about 0.9 s apart, even if several parties spawn in the same frame.
 
 This scene is a copy of Cafe.unity. It has an overhead observation camera, the ceiling hidden, and the original XR rig inactive so you can inspect the entire route. The original Cafe.unity is untouched. Drink delivery still uses the debug buttons.
 
@@ -57,8 +60,10 @@ Select **Customer System** to inspect the entrance, exit, ordered queue markers,
 - Call `TryDeliverDrink(orderId, drink)` after delivery to the matching customer's table. It returns false for an unknown order, wrong drink, duplicate delivery, or a customer who is not yet seated and waiting.
 - `CustomerLeft(int orderId)` reports a completed visit. `CompletedVisits` counts those visits.
 - `TrySpawnParty(int size)` spawns 1–4 customers who share a table; `TrySpawnCustomer()` is a party of one.
+- `CustomerPaid(int orderId, int amount)` fires when a customer finishes their drink and pays; `Earnings` is the running total.
+- `CustomerGaveUp(int orderId)` fires when patience runs out; `GaveUpCount` counts them. `CustomerLeft` / `CompletedVisits` still mean paid visits only, and `TryDeliverDrink` returns false once a customer has given up.
 - The current string drink IDs are placeholders. Agree on shared recipe IDs with the teammate implementing drink preparation before integrating.
-- Unreachable routes or movement blocked for 45 seconds warn in the Console, remove the affected customer, and release its queue position/seat. Waiting at a queue marker or waiting for a drink has no patience timeout yet. Party members wait for each other before leaving.
+- Unreachable routes or movement blocked for 45 seconds warn in the Console, remove the affected customer, and release its queue position/seat. Waiting in the queue has no patience timeout; waiting for a drink does (see above). Party members wait for each other before leaving.
 
 Keep approaches beside chairs, outside furniture collision volumes. The real café integration above uses its own baked NavMesh instead of `PrototypeNavigation`. The customer logic deliberately does not depend on the VR player or coffee machine.
 

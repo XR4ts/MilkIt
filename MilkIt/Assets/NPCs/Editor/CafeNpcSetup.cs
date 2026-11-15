@@ -38,6 +38,7 @@ namespace MilkIt.NPCs.Editor
             ConfigureQueue(system, root.transform);
             ConfigureTables(system, building, root.transform);
             ConfigureCharacters(system);
+            system.patienceIndicatorPrefab = BuildPatienceIndicator();
 
             var left = building.Find("WallFront/Entrance/Left_Door (1)");
             var right = building.Find("WallFront/Entrance/Right_Door (1)");
@@ -128,6 +129,7 @@ namespace MilkIt.NPCs.Editor
             ConfigureQueue(system, system.transform);
             ConfigureTables(system, building, system.transform);
             ConfigureCharacters(system);
+            system.patienceIndicatorPrefab = BuildPatienceIndicator();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log($"CAFE_NPC_UPDATED: {system.tables.Length} tables, {system.seats.Length} seats, {system.queuePositions.Length} queue spots.");
@@ -212,6 +214,75 @@ namespace MilkIt.NPCs.Editor
             seat.sittingPose = Marker("Sitting pose", sit, seat.transform);
             seat.sittingPose.rotation = facing;
             return seat;
+        }
+
+        const string IndicatorPath = "Assets/NPCs/Prefabs/PatienceIndicator.prefab";
+
+        // Marker above a customer's head: cup icon + patience bar, and a text label for "!", seconds and payments.
+        public static CustomerPatienceIndicator BuildPatienceIndicator()
+        {
+            var root = new GameObject("Patience indicator");
+            var indicator = root.AddComponent<CustomerPatienceIndicator>();
+            var waiting = new GameObject("Waiting").transform;
+            waiting.SetParent(root.transform, false);
+            Block("Cup", waiting, new Vector3(-0.38f, 0, 0), new Vector3(0.11f, 0.065f, 0.11f), PrimitiveType.Cylinder, Unlit("IndicatorCup", new Color(0.97f, 0.95f, 0.9f)));
+            Block("Cup handle", waiting, new Vector3(-0.305f, 0.005f, 0), new Vector3(0.035f, 0.07f, 0.03f), PrimitiveType.Cube, Unlit("IndicatorCup", Color.white));
+            Block("Bar back", waiting, new Vector3(0.05f, 0, 0.005f), new Vector3(0.58f, 0.1f, 0.02f), PrimitiveType.Cube, Unlit("IndicatorBack", new Color(0.12f, 0.12f, 0.14f)));
+            var pivot = new GameObject("Fill pivot").transform;
+            pivot.SetParent(waiting, false);
+            pivot.localPosition = new Vector3(-0.21f, 0, -0.01f);
+            var fill = Block("Fill", pivot, new Vector3(0.26f, 0, 0), new Vector3(0.52f, 0.065f, 0.02f), PrimitiveType.Cube, Unlit("IndicatorFill", Color.white));
+
+            var labelObject = new GameObject("Label");
+            labelObject.transform.SetParent(root.transform, false);
+            labelObject.transform.localPosition = new Vector3(0.05f, 0.1f, -0.02f);
+            var label = labelObject.AddComponent<TextMesh>();
+            var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            label.font = font;
+            labelObject.GetComponent<MeshRenderer>().sharedMaterial = font.material;
+            label.fontSize = 96;
+            label.characterSize = 0.022f;
+            label.anchor = TextAnchor.LowerCenter;
+            label.alignment = TextAlignment.Center;
+            label.fontStyle = FontStyle.Bold;
+            label.text = "";
+
+            indicator.waitingGroup = waiting.gameObject;
+            indicator.fillPivot = pivot;
+            indicator.fillRenderer = fill.GetComponent<Renderer>();
+            indicator.label = label;
+            var prefab = PrefabUtility.SaveAsPrefabAsset(root, IndicatorPath);
+            UnityEngine.Object.DestroyImmediate(root);
+            return prefab.GetComponent<CustomerPatienceIndicator>();
+        }
+
+        static GameObject Block(string name, Transform parent, Vector3 position, Vector3 scale, PrimitiveType shape, Material material)
+        {
+            var block = GameObject.CreatePrimitive(shape);
+            block.name = name;
+            UnityEngine.Object.DestroyImmediate(block.GetComponent<Collider>());
+            block.transform.SetParent(parent, false);
+            block.transform.localPosition = position;
+            block.transform.localScale = scale;
+            var renderer = block.GetComponent<Renderer>();
+            renderer.sharedMaterial = material;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            return block;
+        }
+
+        static Material Unlit(string name, Color color)
+        {
+            var path = $"Assets/NPCs/Materials/{name}.mat";
+            var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (material == null)
+            {
+                material = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+                AssetDatabase.CreateAsset(material, path);
+            }
+            material.SetColor("_BaseColor", color);
+            EditorUtility.SetDirty(material);
+            return material;
         }
 
         static void EnsureCharacterPrefabs()

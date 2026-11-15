@@ -52,19 +52,38 @@ namespace MilkIt.NPCs
         [Min(0.1f)] public float orderSeconds = 2f;
         [Min(0.1f)] public float drinkingSeconds = 8f;
         [Range(1, 4)] public int maxPartySize = 4;
+
+        [Header("Patience and payment (set per level)")]
+        [Tooltip("Seconds a seated customer waits for their drink before leaving without paying. 0 = unlimited.")]
+        [Min(0f)] public float patienceSeconds = 60f;
+        [Tooltip("Fraction of patience left when the customer starts looking frustrated.")]
+        [Range(0f, 1f)] public float frustratedAt = 0.35f;
+        [Tooltip("Price per drink, in the same order as Drinks. Missing entries use Default Price.")]
+        public int[] drinkPrices = { 3, 4, 4 };
+        [Min(0)] public int defaultPrice = 3;
+        [Tooltip("Optional marker above each customer's head (patience bar, payment popup).")]
+        public CustomerPatienceIndicator patienceIndicatorPrefab;
         public bool autoServe;
         public bool showDebugPanel = true;
 
         // The order ID identifies one visit, even when multiple customers want the same drink.
         public event Action<int, string> OrderPlaced;
         public event Action<int> CustomerLeft;
+        // orderId, amount. Raised when a customer finishes their drink and pays.
+        public event Action<int, int> CustomerPaid;
+        // orderId. Raised when a customer's patience runs out; they leave without paying.
+        public event Action<int> CustomerGaveUp;
         public int CompletedVisits { get; private set; }
+        public int Earnings { get; private set; }
+        public int GaveUpCount { get; private set; }
         public IReadOnlyList<CustomerController> Customers => customers;
         readonly List<CustomerController> customers = new List<CustomerController>();
         readonly List<CustomerController> queue = new List<CustomerController>();
         int nextOrderId = 1;
         int nextPartyId = 1;
         int partySize = 1;
+        float entranceFreeAt;
+        const float ArrivalSpacing = 0.9f;
         string feedback = "Spawn a customer to begin.";
 
         public bool TrySpawnCustomer() => TrySpawnParty(1);
@@ -95,10 +114,10 @@ namespace MilkIt.NPCs
                 for (var i = 0; i < characterPrefabs.Length; i++) looks.Insert(UnityEngine.Random.Range(0, looks.Count + 1), i);
             for (var i = 0; i < size; i++)
             {
-                var offset = entrance.right * ((i - (size - 1) * 0.5f) * 0.7f);
-                var position = NavMesh.SamplePosition(hit.position + offset, out var spot, 0.6f, NavMesh.AllAreas)
-                    ? spot.position : hit.position;
-                var customer = Instantiate(customerPrefab, position, entrance.rotation, transform);
+                // One customer sets off from the entrance at a time, even when several parties spawn at once.
+                var startAt = Mathf.Max(Time.time, entranceFreeAt);
+                entranceFreeAt = startAt + ArrivalSpacing;
+                var customer = Instantiate(customerPrefab, hit.position, entrance.rotation, transform);
                 customer.gameObject.SetActive(true);
                 if (!reserved[i].TryReserve(customer))
                 {
@@ -110,11 +129,12 @@ namespace MilkIt.NPCs
                     var prefab = characterPrefabs[looks[i % looks.Count]];
                     if (prefab != null) customer.AttachCharacter(prefab, characterWalkSpeed);
                 }
+                customer.AttachIndicator(patienceIndicatorPrefab);
                 customers.Add(customer);
                 queue.Add(customer);
                 party?.Members.Add(customer);
                 int id = nextOrderId++;
-                customer.Begin(this, reserved[i], id, drinks[(id - 1) % drinks.Length], party, i * 0.8f);
+                customer.Begin(this, reserved[i], id, drinks[(id - 1) % drinks.Length], party, startAt - Time.time);
             }
             feedback = size == 1 ? $"Customer {firstId} arrived."
                 : $"Party {party.Id} arrived: customers {firstId}–{nextOrderId - 1}.";
@@ -180,6 +200,28 @@ namespace MilkIt.NPCs
             OrderPlaced?.Invoke(customer.OrderId, customer.Drink);
         }
 
+        public int PriceOf(string drink)
+        {
+            var index = drinks != null ? Array.IndexOf(drinks, drink) : -1;
+            return index >= 0 && drinkPrices != null && index < drinkPrices.Length ? drinkPrices[index] : defaultPrice;
+        }
+
+        internal int Pay(CustomerController customer)
+        {
+            var amount = PriceOf(customer.Drink);
+            Earnings += amount;
+            feedback = $"Customer {customer.OrderId} paid {amount} for {customer.Drink}.";
+            CustomerPaid?.Invoke(customer.OrderId, amount);
+            return amount;
+        }
+
+        internal void GiveUp(CustomerController customer)
+        {
+            GaveUpCount++;
+            feedback = $"Customer {customer.OrderId} waited too long and left without paying.";
+            CustomerGaveUp?.Invoke(customer.OrderId);
+        }
+
         // Call this from the team's serving system once a drink is delivered to this customer.
         // False means an unknown order, wrong drink, or customer not ready to receive it.
         public bool TryDeliverDrink(int orderId, string drink)
@@ -229,13 +271,16 @@ namespace MilkIt.NPCs
             var free = 0;
             if (seats != null) foreach (var s in seats) if (s != null && s.Occupant == null) free++;
             GUILayout.Label($"Active: {customers.Count}    Completed: {CompletedVisits}    Free seats: {free}");
+            GUILayout.Label($"Earnings: {Earnings}    Left unpaid: {GaveUpCount}    Patience: {(patienceSeconds > 0f ? patienceSeconds + " s" : "unlimited")}");
             GUILayout.Label(feedback);
             foreach (var customer in customers)
             {
                 if (customer == null) continue;
                 GUILayout.Space(8);
                 var group = customer.Party != null ? $" · party {customer.Party.Id}" : "";
-                GUILayout.Label($"#{customer.OrderId} · {customer.Drink} · {customer.State}{group}");
+                var wait = customer.State == CustomerState.WaitingForDrink && patienceSeconds > 0f
+                    ? $" · {Mathf.CeilToInt(customer.PatienceSecondsLeft)} s{(customer.Frustrated ? " !" : "")}" : "";
+                GUILayout.Label($"#{customer.OrderId} · {customer.Drink} ({PriceOf(customer.Drink)}) · {customer.State}{wait}{group}");
                 if (customer.State == CustomerState.WaitingForDrink &&
                     GUILayout.Button($"Serve {customer.Drink} to #{customer.OrderId}"))
                     TryDeliverDrink(customer.OrderId, customer.Drink);
