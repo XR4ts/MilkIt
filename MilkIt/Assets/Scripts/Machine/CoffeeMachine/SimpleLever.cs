@@ -21,14 +21,12 @@ namespace MilkIt.Machine.CoffeeMachine{
             if (float.IsNaN(angle)) return;
             if (fluidSource != null) 
             {   
-                Debug.Log("Using main source");
                 fluidSource.SetFlowScale(angle);
                 if (alternativeFluidSource != null) alternativeFluidSource.SetFlowScale(0);
                 return;
             }
             if (alternativeFluidSource != null)
             {
-                Debug.Log("Using alternative source");
                 alternativeFluidSource.SetFlowScale(angle);
                 return;
             }

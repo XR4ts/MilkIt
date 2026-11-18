@@ -14,7 +14,6 @@ namespace MilkIt.Machine.CoffeeMachine{
         [Header("Receiver")]
         [Tooltip("Where the flask should be positioned.")]
         public Transform attachmentPoint;
-        public Transform parent;
 	    [SerializeField] private SimpleLever manages; 
     
         private Flask currentFlask;
@@ -32,8 +31,12 @@ namespace MilkIt.Machine.CoffeeMachine{
     
         private void AttachFlask(Flask flask)
         {
-            if (!flask.CanSnap) return;
-            flask.DisableBasketColliders(true);
+            if (!flask.CanSnap)
+            {
+                return;
+            }
+            Debug.Log("Attaching flask...");
+            flask.WhenConnected(true);
             ForceRelease(flask);
             currentFlask = flask;
             flask.SetReceiver(this);
@@ -42,9 +45,6 @@ namespace MilkIt.Machine.CoffeeMachine{
     
             if (rb != null)
             {
-                rb.isKinematic = false;
-                rb.linearVelocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
                 rb.isKinematic = true;
             }
     
@@ -56,25 +56,28 @@ namespace MilkIt.Machine.CoffeeMachine{
     
             // Activate this receiver's fluid source.
             manages.fluidSource = flask.fluidSource;
+            flask.StartSnapCooldown();
+            Debug.Log("Flask attached");
         }
     
-        public void RemoveFlask()
+        public void RemoveFlask(Flask flask, IXRSelectInteractor interactor)
         {
-            if (currentFlask == null)
-                return;
-    
-            Flask flask = currentFlask;
+            Debug.Log("Detaching flask...");
+            ForceRelease(flask);
             currentFlask = null;
+            flask.WhenConnected(false);
     
             manages.fluidSource = null;
             flask.SetReceiver(null);
-            flask.transform.SetParent(parent);
     
             Rigidbody rb = flask.GetComponent<Rigidbody>();
-    
             if (rb != null)
+            {
                 rb.isKinematic = false;
-    
+            }
+            flask.StartSnapCooldown();
+            ForceGrab(flask, interactor);
+            Debug.Log("Flask detached");
         }
 
         private void ForceRelease(Flask flask)
@@ -94,6 +97,21 @@ namespace MilkIt.Machine.CoffeeMachine{
             {
                 manager.SelectExit(interactor, grab);
             }
+        }
+
+        private void ForceGrab(Flask flask, IXRSelectInteractor interactor)
+        {
+            XRGrabInteractable grab = flask.GetComponent<XRGrabInteractable>();
+
+            if (grab == null || grab.isSelected)
+                return;
+
+            var manager = grab.interactionManager;
+
+            if (manager == null)
+                return;
+
+            manager.SelectEnter(interactor, grab);
         }
     }
 }
