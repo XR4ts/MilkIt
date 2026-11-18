@@ -7,8 +7,6 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using System.Linq;
 
 namespace MilkIt.Machine.CoffeeMachine{
-    //TODO: figure out what to do with the colliders, rebuild the body? Make a list of colliders to disable?
-    // TODO: now a list of colliders is disabled, but that causes it to just fall out, idk maybe because of gravity??? idk
     public class FlaskDetector : MonoBehaviour
     {
         [Header("Receiver")]
@@ -23,9 +21,11 @@ namespace MilkIt.Machine.CoffeeMachine{
             if (currentFlask != null)
                 return;
     
+            Debug.Log($"Object={other} entered trigger");
             if (!other.TryGetComponent<Flask>(out Flask flask))
                 return;
-    
+
+            Debug.Log($"Flask={flask} entered trigger");
             AttachFlask(flask);
         }
     
@@ -35,7 +35,6 @@ namespace MilkIt.Machine.CoffeeMachine{
             {
                 return;
             }
-            Debug.Log("Attaching flask...");
             ForceRelease(flask); // release the flask from player grab
 
             flask.WhenConnected(true);
@@ -53,20 +52,26 @@ namespace MilkIt.Machine.CoffeeMachine{
             flask.transform.position = attachmentPoint.position;
     
             // Activate this receiver's fluid source.
-            manages.fluidSource = flask.fluidSource;
+            if (manages != null)
+            {
+                manages.fluidSource = flask.fluidSource;
+            }
             flask.StartSnapCooldown();
 
-            Debug.Log("Flask attached");
+            Debug.Log($"Attached {flask} to {attachmentPoint}");
         }
     
         public void RemoveFlask(Flask flask, IXRSelectInteractor interactor)
         {
-            Debug.Log("Detaching flask...");
             ForceRelease(flask); // release the flask to manipulate rigidbody and parent
 
             currentFlask = null;
             flask.WhenConnected(false);
-            manages.fluidSource = null;
+            if (manages != null)
+            {
+                manages.fluidSource = null;   
+                flask.fluidSource.SetFlowScale(0);
+            }   
             flask.SetReceiver(null);
     
             Rigidbody rb = flask.GetComponent<Rigidbody>();
@@ -77,7 +82,7 @@ namespace MilkIt.Machine.CoffeeMachine{
             flask.StartSnapCooldown();
 
             ForceGrab(flask, interactor);
-            Debug.Log("Flask detached");
+            Debug.Log($"Dettached {flask} to {flask.defaultParent}");
         }
 
         private void ForceRelease(Flask flask)
