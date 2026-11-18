@@ -36,37 +36,36 @@ namespace MilkIt.Machine.CoffeeMachine{
                 return;
             }
             Debug.Log("Attaching flask...");
+            ForceRelease(flask); // release the flask from player grab
+
             flask.WhenConnected(true);
-            ForceRelease(flask);
+            
             currentFlask = flask;
             flask.SetReceiver(this);
-            // Suspend the flask in the receiver.
+            
             Rigidbody rb = flask.GetComponent<Rigidbody>();
-    
             if (rb != null)
             {
                 rb.isKinematic = true;
             }
     
             flask.transform.SetParent(attachmentPoint);
-            flask.transform.SetPositionAndRotation(
-                attachmentPoint.position,
-                attachmentPoint.rotation
-            );
+            flask.transform.position = attachmentPoint.position;
     
             // Activate this receiver's fluid source.
             manages.fluidSource = flask.fluidSource;
             flask.StartSnapCooldown();
+
             Debug.Log("Flask attached");
         }
     
         public void RemoveFlask(Flask flask, IXRSelectInteractor interactor)
         {
             Debug.Log("Detaching flask...");
-            ForceRelease(flask);
+            ForceRelease(flask); // release the flask to manipulate rigidbody and parent
+
             currentFlask = null;
             flask.WhenConnected(false);
-    
             manages.fluidSource = null;
             flask.SetReceiver(null);
     
@@ -76,6 +75,7 @@ namespace MilkIt.Machine.CoffeeMachine{
                 rb.isKinematic = false;
             }
             flask.StartSnapCooldown();
+
             ForceGrab(flask, interactor);
             Debug.Log("Flask detached");
         }
@@ -83,16 +83,13 @@ namespace MilkIt.Machine.CoffeeMachine{
         private void ForceRelease(Flask flask)
         {
             XRGrabInteractable grab = flask.GetComponent<XRGrabInteractable>();
-
             if (grab == null || !grab.isSelected)
                 return;
 
             var manager = grab.interactionManager;
-
             if (manager == null)
                 return;
 
-            // Release every interactor currently selecting the flask.
             foreach (var interactor in grab.interactorsSelecting.ToArray())
             {
                 manager.SelectExit(interactor, grab);
@@ -102,12 +99,10 @@ namespace MilkIt.Machine.CoffeeMachine{
         private void ForceGrab(Flask flask, IXRSelectInteractor interactor)
         {
             XRGrabInteractable grab = flask.GetComponent<XRGrabInteractable>();
-
             if (grab == null || grab.isSelected)
                 return;
 
             var manager = grab.interactionManager;
-
             if (manager == null)
                 return;
 

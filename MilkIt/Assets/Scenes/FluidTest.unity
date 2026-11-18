@@ -1082,6 +1082,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 136555269}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &142233254
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 142233255}
+  m_Layer: 0
+  m_Name: willoughsby-espresso-R-lever-spout
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &142233255
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 142233254}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0.00018930435, y: 0.46625736, z: 0.2716}
+  m_LocalScale: {x: 100, y: 100, z: 100}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 543450651999382655}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &153098187
 GameObject:
   m_ObjectHideFlags: 0
@@ -1387,7 +1418,7 @@ GameObject:
   m_Component:
   - component: {fileID: 251013065}
   m_Layer: 0
-  m_Name: lever-L-spout
+  m_Name: willoughsby-espresso-L-lever-spout
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2281,10 +2312,10 @@ GameObject:
   - component: {fileID: 395993313}
   - component: {fileID: 395993312}
   - component: {fileID: 395993311}
-  - component: {fileID: 395993309}
   - component: {fileID: 395993307}
-  - component: {fileID: 395993306}
+  - component: {fileID: 395993309}
   - component: {fileID: 395993315}
+  - component: {fileID: 395993306}
   - component: {fileID: 395993310}
   - component: {fileID: 395993308}
   - component: {fileID: 395993314}
@@ -2305,7 +2336,7 @@ Transform:
   m_GameObject: {fileID: 395993304}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: -0.4378, y: -0.056, z: -0.269}
+  m_LocalPosition: {x: -0.0007, y: 0.4423, z: -0.2682}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2702,7 +2733,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Flask
   fluidSource: {fileID: 395993314}
-  snapDelay: 2
   basketColliders:
   - {fileID: 395993306}
   - {fileID: 1601888682}
@@ -6313,11 +6343,13 @@ GameObject:
   - component: {fileID: 801672653}
   - component: {fileID: 801672652}
   - component: {fileID: 801672651}
-  - component: {fileID: 801672650}
   - component: {fileID: 801672649}
   - component: {fileID: 801672648}
   - component: {fileID: 801672647}
   - component: {fileID: 801672646}
+  - component: {fileID: 801672650}
+  - component: {fileID: 801672655}
+  - component: {fileID: 801672654}
   m_Layer: 0
   m_Name: willoughsby-espresso-R-lever
   m_TagString: Untagged
@@ -6333,13 +6365,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 801672644}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071069, y: 0, z: 0, w: 0.7071067}
-  m_LocalPosition: {x: 0.00018931563, y: 0.5362, z: 0.3219}
+  m_LocalRotation: {x: -0.70710677, y: 0, z: 0, w: 0.70710677}
+  m_LocalPosition: {x: 0, y: 0.535, z: 0.322}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 543450651999382655}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: -90, z: 90}
 --- !u!59 &801672646
 HingeJoint:
   m_ObjectHideFlags: 0
@@ -6357,7 +6389,7 @@ HingeJoint:
   m_UseSpring: 1
   m_Spring:
     spring: 0
-    damper: 0.5
+    damper: 50
     targetPosition: 0
   m_UseMotor: 0
   m_Motor:
@@ -6369,7 +6401,7 @@ HingeJoint:
   m_UseAcceleration: 0
   m_Limits:
     min: -150
-    max: 0
+    max: 1
     bounciness: 0
     bounceMinVelocity: 0.2
     contactDistance: 0
@@ -6600,7 +6632,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -6662,6 +6694,53 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 801672644}
   m_Mesh: {fileID: -3720441129051870584, guid: c57936fd949ca1b41b98b7ffd20ee53a, type: 3}
+--- !u!114 &801672654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 801672644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50926349f50d5db5b81a7ff90866c207, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Fluids.FluidSource
+  fluidType: {fileID: 11400000, guid: 5cb589cc912b82e9bbdd89029349dd2b, type: 2}
+  flowRate: 60
+  spout: {fileID: 142233255}
+  startOn: 1
+  doseAmount: 40
+  supply: {fileID: 0}
+  supplyType: {fileID: 0}
+  supplyPerOutput: 1
+  onStarted:
+    m_PersistentCalls:
+      m_Calls: []
+  onStopped:
+    m_PersistentCalls:
+      m_Calls: []
+  onDoseCompleted:
+    m_PersistentCalls:
+      m_Calls: []
+  onSupplyEmpty:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &801672655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 801672644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cabf49a7066e444f84e9d17776a6939, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SimpleLever
+  hinge: {fileID: 801672646}
+  fluidSource: {fileID: 0}
+  alternativeFluidSource: {fileID: 801672654}
 --- !u!1 &803604923
 GameObject:
   m_ObjectHideFlags: 0
@@ -10636,11 +10715,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Fluids.FluidSource_MultiSpout
   fluidType: {fileID: 11400000, guid: 62160502f1fcb835f9148baf431ee8b1, type: 2}
-  flowRate: 5
+  flowRate: 60
   spout: {fileID: 0}
   startOn: 1
   doseAmount: 40
-  supply: {fileID: 0}
+  supply: {fileID: 1285663012}
   supplyType: {fileID: 0}
   supplyPerOutput: 0
   onStarted:
@@ -12783,6 +12862,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1539486539}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1556102002
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1556102003}
+  m_Layer: 0
+  m_Name: willoughsby-espresso-R-flask-attachment-point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1556102003
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1556102002}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.000099897385, y: 0.4428, z: 0.268}
+  m_LocalScale: {x: 0.1, y: 0.09, z: 0.1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 543450651999382655}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!1 &1564067388
 GameObject:
   m_ObjectHideFlags: 0
@@ -15768,6 +15878,133 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1835155286}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1854157587
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1854157588}
+  - component: {fileID: 1854157592}
+  - component: {fileID: 1854157591}
+  - component: {fileID: 1854157590}
+  - component: {fileID: 1854157589}
+  m_Layer: 0
+  m_Name: willoughsby-espresso-R-flask-trigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1854157588
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1854157587}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.0001, y: 0.4272, z: 0.274}
+  m_LocalScale: {x: 0.1, y: 0.09, z: 0.1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 543450651999382655}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1854157589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1854157587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3037ce451366c004a951391220c08332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FlaskDetector
+  attachmentPoint: {fileID: 1556102003}
+  manages: {fileID: 801672655}
+--- !u!65 &1854157590
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1854157587}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 0.75671786, z: 1}
+  m_Center: {x: 0, y: 0.12164107, z: 0}
+--- !u!23 &1854157591
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1854157587}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1854157592
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1854157587}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1860064395
 GameObject:
   m_ObjectHideFlags: 0
@@ -16106,13 +16343,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1904047615}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0.000099897385, y: 0.4428, z: -0.2681}
   m_LocalScale: {x: 0.1, y: 0.09, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 543450651999382655}
-  m_LocalEulerAnglesHint: {x: -90, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!1 &1910006493
 GameObject:
   m_ObjectHideFlags: 0
@@ -17101,15 +17338,18 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7075376335633438366}
-  - {fileID: 5444598191953702997}
   - {fileID: 6765579722197186658}
+  - {fileID: 7075376335633438366}
   - {fileID: 801672645}
+  - {fileID: 142233255}
+  - {fileID: 5444598191953702997}
+  - {fileID: 1854157588}
+  - {fileID: 1556102003}
   - {fileID: 7132833565290157013}
+  - {fileID: 251013065}
   - {fileID: 395993305}
   - {fileID: 283977206}
   - {fileID: 1904047616}
-  - {fileID: 251013065}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &660405973951153838
@@ -17189,11 +17429,11 @@ GameObject:
   - component: {fileID: 3304115240450404861}
   - component: {fileID: 7048424123617431662}
   - component: {fileID: 1731198932}
-  - component: {fileID: 1731198931}
   - component: {fileID: 1731198934}
   - component: {fileID: 1731198933}
   - component: {fileID: 1731198943}
   - component: {fileID: 1731198938}
+  - component: {fileID: 1731198931}
   - component: {fileID: 1731198944}
   - component: {fileID: 1731198948}
   m_Layer: 0
@@ -17317,12 +17557,13 @@ GameObject:
   - component: {fileID: 7531004068479265582}
   - component: {fileID: 7124871535813037101}
   - component: {fileID: 1285663007}
-  - component: {fileID: 1285663006}
-  - component: {fileID: 1285663008}
-  - component: {fileID: 1285663012}
   - component: {fileID: 1285663014}
+  - component: {fileID: 1285663008}
   - component: {fileID: 1285663015}
+  - component: {fileID: 1285663006}
+  - component: {fileID: 1285663012}
   - component: {fileID: 1285663016}
+  - component: {fileID: 7531004068479265583}
   m_Layer: 0
   m_Name: willoughsby-espresso-R-flask
   m_TagString: Untagged
@@ -17338,8 +17579,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5087172648577142492}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -3.882, y: 0.589, z: 0.224}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
+  m_LocalPosition: {x: -0.0003, y: 0.4404, z: 0.2678}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -17348,7 +17589,7 @@ Transform:
   - {fileID: 1792229232}
   - {fileID: 1661535179}
   m_Father: {fileID: 543450651999382655}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 180, z: 0}
 --- !u!33 &5613366891639541769
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -17366,7 +17607,7 @@ Transform:
   m_GameObject: {fileID: 2304145103943586018}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071069, y: 0, z: 0, w: 0.7071067}
-  m_LocalPosition: {x: -0, y: -0.0018497314, z: 2.7755575e-19}
+  m_LocalPosition: {x: 0, y: -0.0018497314, z: 0}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17508,6 +17749,24 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5087172648577142492}
   m_Mesh: {fileID: 3952899564319221804, guid: c57936fd949ca1b41b98b7ffd20ee53a, type: 3}
+--- !u!114 &7531004068479265583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5087172648577142492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d25973ec989eae46a613239bd381bed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Flask
+  fluidSource: {fileID: 1285663016}
+  basketColliders:
+  - {fileID: 1285663015}
+  - {fileID: 627733612}
+  baseScale: {x: 100, y: 100, z: 100}
+  defaultParent: {fileID: 543450651999382655}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

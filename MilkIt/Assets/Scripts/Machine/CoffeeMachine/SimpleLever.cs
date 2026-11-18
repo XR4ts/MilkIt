@@ -18,7 +18,8 @@ namespace MilkIt.Machine.CoffeeMachine{
             float angle = Mathf.Abs(Mathf.Round(hinge.angle * 0.8f)) / total;
             if (angle <= 0.01f) angle = 0f;
             else if (angle > 0.999f) angle = 0.999f;
-            if (float.IsNaN(angle)) return;
+            
+            if (float.IsNaN(angle)) angle = 0f;
             if (fluidSource != null) 
             {   
                 fluidSource.SetFlowScale(angle);
