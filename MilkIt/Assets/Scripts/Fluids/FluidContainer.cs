@@ -13,7 +13,7 @@ namespace MilkIt.Fluids
         [Min(1f), Tooltip("Maximum volume in ml.")]
         public float capacity = 250f;
         [SerializeField, Tooltip("Current contents in ml, in the order each material was first poured in.")]
-        List<FluidLayer> layers = new List<FluidLayer>();
+        protected List<FluidLayer> layers = new List<FluidLayer>();
 
         [Header("Shape (treated as a cylinder, in the opening's local units)")]
         [Tooltip("Centre of the rim, +Y pointing out of the container. Defaults to this transform.")]
@@ -52,13 +52,13 @@ namespace MilkIt.Fluids
 
         public event Action<FluidContainer> ContentsChanged;
 
-        float total;
-        float lastSubmergedTime = -10f;
-        FluidStream stream;
-        MeshRenderer fillRenderer;
-        FluidFillMesh fillMesh;
-        Vector3 fillGravity;
-        bool fillDirty = true;
+        protected float total;
+        protected float lastSubmergedTime = -10f;
+        protected FluidStream stream;
+        protected MeshRenderer fillRenderer;
+        protected FluidFillMesh fillMesh;
+        protected Vector3 fillGravity;
+        protected bool fillDirty = true;
 
         public Transform Opening => opening != null ? opening : transform;
         public IReadOnlyList<FluidLayer> Layers => layers;
@@ -70,6 +70,7 @@ namespace MilkIt.Fluids
         public float WorldDepth => depth * Opening.lossyScale.y;
 
         public float SurfaceWorldY => Opening.position.y - WorldDepth * (isDrain ? 1f : 1f - FillFraction);
+        protected MeshCollider fillCollider;
 
         void Awake()
         {
@@ -247,8 +248,24 @@ namespace MilkIt.Fluids
             return stream;
         }
 
-        void UpdateFillVisual()
+        protected virtual void UpdateFillVisual()
         {
+            if (fillRenderer == null)
+            {
+                fillMesh = new FluidFillMesh();
+
+                fillRenderer = FluidVisuals.CreateRenderer(
+                    "Fluid Fill",
+                    Opening,
+                    fillMesh.Mesh
+                );
+
+                fillCollider = fillRenderer.gameObject.AddComponent<MeshCollider>();
+                fillCollider.convex = true;
+                fillCollider.isTrigger = true;
+                fillCollider.sharedMesh = fillMesh.Mesh;
+            }
+            
             if (!Application.isPlaying) return;
             Vector3 gravity = Opening.InverseTransformDirection(Vector3.down);
             fillGravity = gravity;
@@ -258,6 +275,7 @@ namespace MilkIt.Fluids
             bool show = showFill && !isDrain && total > 0f && cos > 0.03f;
             if (!show)
             {
+                if (fillCollider != null) fillCollider.enabled = false;
                 if (fillRenderer != null) fillRenderer.enabled = false;
                 return;
             }
@@ -272,6 +290,10 @@ namespace MilkIt.Fluids
             lowSide = sin > 0.0001f ? lowSide / lowSide.magnitude : Vector2.right;
             float height = FluidFillMesh.SolveHeight(FillFraction, openingRadius, depth, sin, cos);
             fillMesh.Rebuild(openingRadius * 0.97f, depth, height, sin, cos, lowSide);
+            // Refresh the collider to match the newly generated liquid mesh.
+            fillCollider.sharedMesh = null;
+            fillCollider.sharedMesh = fillMesh.Mesh;
+            fillCollider.enabled = true;
 
             fillRenderer.enabled = true;
             FluidVisuals.Apply(fillRenderer, FluidMix.Blend(layers, out FluidType dominant), dominant);
