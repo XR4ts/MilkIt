@@ -36,8 +36,8 @@ Transform:
   m_GameObject: {fileID: 1058865510965618360}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: -0.0007, y: 0.4423, z: -0.2682}
-  m_LocalScale: {x: 100, y: 100, z: 100}
+  m_LocalPosition: {x: 0.0008997917, y: 0.44230002, z: -0.26799998}
+  m_LocalScale: {x: 100.00003, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4198445378176279497}
@@ -1321,13 +1321,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2518548820074466566}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
   m_LocalPosition: {x: 0.000099897385, y: 0.4428, z: -0.2681}
   m_LocalScale: {x: 0.1, y: 0.09, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6052023040085745377}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 180, z: 0}
 --- !u!1 &2538458345127864594
 GameObject:
   m_ObjectHideFlags: 0
@@ -1601,6 +1601,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06325564, y: 0.06320478, z: 0.025327317}
   m_Center: {x: -0.0008746187, y: -0.000091971175, z: -0.010857719}
+--- !u!1 &2971658734499159806
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8471836632104962090}
+  - component: {fileID: 4117203781305496434}
+  - component: {fileID: 1294856758318106641}
+  m_Layer: 0
+  m_Name: Milk-transforrmer-R
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8471836632104962090
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2971658734499159806}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.09396534, y: 0.018474825, z: -0.19203311, w: 0.97670496}
+  m_LocalPosition: {x: -0.22370005, y: 0.315, z: 0.11869997}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6052023040085745377}
+  m_LocalEulerAnglesHint: {x: -10.163, y: 4.205, z: -22.621}
+--- !u!136 &4117203781305496434
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2971658734499159806}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.012669242
+  m_Height: 0.054402016
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1294856758318106641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2971658734499159806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d984a2a3fa2d0cf4abb0b78beef0c70f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LiquirdChanger
+  fromFluid: {fileID: 11400000, guid: 90c472831bf85f91f84391719b0ea973, type: 2}
+  toFluid: {fileID: 11400000, guid: 2fb006ed33c92cd4cbedefcc05840c2e, type: 2}
+  transformScale: 1
+  takenScale: 1.2
 --- !u!1 &3546013463188863897
 GameObject:
   m_ObjectHideFlags: 0
@@ -2291,9 +2363,11 @@ Transform:
   - {fileID: 4443369143186863829}
   - {fileID: 8244485829489950632}
   - {fileID: 6612519943240728332}
-  - {fileID: 1055743445260888854}
   - {fileID: 3278122696733059939}
   - {fileID: 2761621020065474494}
+  - {fileID: 1055743445260888854}
+  - {fileID: 8837397720899718565}
+  - {fileID: 8471836632104962090}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5379939760051311326
@@ -2417,6 +2491,78 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &7890497985713620445
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8837397720899718565}
+  - component: {fileID: 9046501663286319252}
+  - component: {fileID: 5449790890339125508}
+  m_Layer: 0
+  m_Name: Milk-transforrmer-L
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8837397720899718565
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7890497985713620445}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.2276001, y: 0.3595, z: 0.17769998}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6052023040085745377}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &9046501663286319252
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7890497985713620445}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.012669242
+  m_Height: 0.054402016
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5449790890339125508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7890497985713620445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d984a2a3fa2d0cf4abb0b78beef0c70f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LiquirdChanger
+  fromFluid: {fileID: 11400000, guid: 90c472831bf85f91f84391719b0ea973, type: 2}
+  toFluid: {fileID: 11400000, guid: 2fb006ed33c92cd4cbedefcc05840c2e, type: 2}
+  transformScale: 1
+  takenScale: 1.2
 --- !u!1 &8781422735910179755
 GameObject:
   m_ObjectHideFlags: 0

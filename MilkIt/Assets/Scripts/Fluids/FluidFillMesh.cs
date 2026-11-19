@@ -4,7 +4,7 @@ namespace MilkIt.Fluids
 {
     public class FluidFillMesh
     {
-        const int Sides = 24;
+        const int Sides = 20;
         const int Rings = 5;
         const int Samples = 32;
 

@@ -70,6 +70,7 @@ namespace MilkIt.Fluids
         public float WorldDepth => depth * Opening.lossyScale.y;
 
         public float SurfaceWorldY => Opening.position.y - WorldDepth * (isDrain ? 1f : 1f - FillFraction);
+        protected MeshCollider fillCollider;
 
         void Awake()
         {
@@ -249,6 +250,22 @@ namespace MilkIt.Fluids
 
         protected virtual void UpdateFillVisual()
         {
+            if (fillRenderer == null)
+            {
+                fillMesh = new FluidFillMesh();
+
+                fillRenderer = FluidVisuals.CreateRenderer(
+                    "Fluid Fill",
+                    Opening,
+                    fillMesh.Mesh
+                );
+
+                fillCollider = fillRenderer.gameObject.AddComponent<MeshCollider>();
+                fillCollider.convex = true;
+                fillCollider.isTrigger = true;
+                fillCollider.sharedMesh = fillMesh.Mesh;
+            }
+            
             if (!Application.isPlaying) return;
             Vector3 gravity = Opening.InverseTransformDirection(Vector3.down);
             fillGravity = gravity;
@@ -258,6 +275,7 @@ namespace MilkIt.Fluids
             bool show = showFill && !isDrain && total > 0f && cos > 0.03f;
             if (!show)
             {
+                if (fillCollider != null) fillCollider.enabled = false;
                 if (fillRenderer != null) fillRenderer.enabled = false;
                 return;
             }
@@ -272,6 +290,10 @@ namespace MilkIt.Fluids
             lowSide = sin > 0.0001f ? lowSide / lowSide.magnitude : Vector2.right;
             float height = FluidFillMesh.SolveHeight(FillFraction, openingRadius, depth, sin, cos);
             fillMesh.Rebuild(openingRadius * 0.97f, depth, height, sin, cos, lowSide);
+            // Refresh the collider to match the newly generated liquid mesh.
+            fillCollider.sharedMesh = null;
+            fillCollider.sharedMesh = fillMesh.Mesh;
+            fillCollider.enabled = true;
 
             fillRenderer.enabled = true;
             FluidVisuals.Apply(fillRenderer, FluidMix.Blend(layers, out FluidType dominant), dominant);

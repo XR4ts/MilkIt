@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Water
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Fluids.FluidType
   displayName: Water
-  color: {r: 0.55, g: 0.8, b: 1, a: 1}
+  color: {r: 0.55, g: 0.8, b: 1, a: 0.101960786}
   state: 0
   material: {fileID: 2100000, guid: 05d5c30d0c4f745efa08c9fa2784de62, type: 2}

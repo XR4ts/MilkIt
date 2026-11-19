@@ -21,11 +21,11 @@ namespace MilkIt.Machine.CoffeeMachine{
             if (currentFlask != null)
                 return;
     
-            Debug.Log($"Object={other} entered trigger");
+            // Debug.Log($"Object={other} entered trigger");
             if (!other.TryGetComponent<Flask>(out Flask flask))
                 return;
 
-            Debug.Log($"Flask={flask} entered trigger");
+            // Debug.Log($"Flask={flask} entered trigger");
             AttachFlask(flask);
         }
     
@@ -58,7 +58,7 @@ namespace MilkIt.Machine.CoffeeMachine{
             }
             flask.StartSnapCooldown();
 
-            Debug.Log($"Attached {flask} to {attachmentPoint}");
+            // Debug.Log($"Attached {flask} to {attachmentPoint}");
         }
     
         public void RemoveFlask(Flask flask, IXRSelectInteractor interactor)
@@ -82,7 +82,7 @@ namespace MilkIt.Machine.CoffeeMachine{
             flask.StartSnapCooldown();
 
             ForceGrab(flask, interactor);
-            Debug.Log($"Dettached {flask} to {flask.defaultParent}");
+            // Debug.Log($"Dettached {flask} to {flask.defaultParent}");
         }
 
         private void ForceRelease(Flask flask)
