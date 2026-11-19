@@ -4,7 +4,7 @@ using UnityEngine.AI;
 
 namespace MilkIt.NPCs
 {
-    public enum CustomerState { Entering, Queueing, Ordering, WalkingToSeat, WaitingForDrink, Drinking, WaitingForParty, Leaving }
+    public enum CustomerState { Entering, Queueing, Ordering, WalkingToSeat, WaitingForDrink, Drinking, WaitingForParty, Leaving, LeavingAngry }
 
     [RequireComponent(typeof(NavMeshAgent))]
     public sealed class CustomerController : MonoBehaviour
@@ -17,6 +17,12 @@ namespace MilkIt.NPCs
         public CustomerParty Party { get; private set; }
         public bool DoneDrinking { get; private set; }
         public CustomerAnimator Character { get; private set; }
+        // Patience while waiting for the drink: 1 = just sat down, 0 = gives up and leaves without paying.
+        public float Patience01 { get; private set; } = 1f;
+        public float PatienceSecondsLeft { get; private set; }
+        public bool Frustrated { get; private set; }
+        public bool GaveUp { get; private set; }
+        public int AmountPaid { get; private set; }
         // Where the debug label is drawn.
         public Vector3 LabelPosition => Character != null ? transform.position + Vector3.up * 2.1f
             : body != null ? body.position + Vector3.up * 1.2f : transform.position;
@@ -31,6 +37,7 @@ namespace MilkIt.NPCs
         int moveFrame;
         float startDelay;
         Vector3 destination;
+        CustomerPatienceIndicator indicator;
 
         const float SeatWalkSpeed = 0.7f;
         const float SipInterval = 3.2f;
@@ -55,6 +62,21 @@ namespace MilkIt.NPCs
             Character.Init(animator, agent);
         }
 
+        void SetVisible(bool visible)
+        {
+            foreach (var r in GetComponentsInChildren<Renderer>(true))
+                if (body == null || !r.transform.IsChildOf(body) || Character == null) r.enabled = visible;
+        }
+
+        public void AttachIndicator(CustomerPatienceIndicator prefab)
+        {
+            if (prefab == null) return;
+            indicator = Instantiate(prefab, transform.parent);
+            var head = Character != null ? Character.Animator.GetBoneTransform(HumanBodyBones.Head) : null;
+            indicator.Attach(head != null ? head : body != null ? body : transform);
+            if (head == null) indicator.heightAboveHead = 1.3f;
+        }
+
         public void Begin(CafeCustomerSystem owner, CustomerSeat reservedSeat, int orderId, string drink,
             CustomerParty party = null, float delay = 0f)
         {
@@ -73,8 +95,17 @@ namespace MilkIt.NPCs
 
         IEnumerator Visit()
         {
-            // Party members set off slightly apart so they do not spawn into each other.
-            if (startDelay > 0f) yield return new WaitForSeconds(startDelay);
+            // Customers wait their turn at the entrance hidden and without an agent, so they never overlap.
+            if (startDelay > 0.01f)
+            {
+                var spawn = transform.position;
+                agent.enabled = false;
+                SetVisible(false);
+                yield return new WaitForSeconds(startDelay);
+                transform.position = spawn;
+                agent.enabled = true;
+                SetVisible(true);
+            }
             if (cafe.entryWaypoint != null)
             {
                 if (!MoveTo(cafe.entryWaypoint.position)) yield break;
@@ -129,10 +160,33 @@ namespace MilkIt.NPCs
             }
 
             State = CustomerState.WaitingForDrink;
+            var patience = cafe.patienceSeconds;
+            var waitStarted = Time.time;
             while (State == CustomerState.WaitingForDrink)
             {
+                if (patience > 0f)
+                {
+                    PatienceSecondsLeft = Mathf.Max(0f, patience - (Time.time - waitStarted));
+                    Patience01 = PatienceSecondsLeft / patience;
+                    Frustrated = Patience01 <= cafe.frustratedAt;
+                    if (PatienceSecondsLeft <= 0f) { State = CustomerState.LeavingAngry; break; }
+                }
+                if (indicator != null) indicator.ShowWaiting(Patience01, patience > 0f ? PatienceSecondsLeft : -1f, Frustrated);
                 if (Character != null) SeatedPose();
                 yield return null;
+            }
+            Frustrated = false;
+            if (indicator != null) indicator.Hide();
+
+            if (State == CustomerState.LeavingAngry)
+            {
+                // Waited too long: leave alone, without paying. Friends carry on.
+                GaveUp = true;
+                DoneDrinking = true;
+                cafe.GiveUp(this);
+                if (indicator != null) indicator.ShowGaveUp();
+                yield return LeaveCafe(false);
+                yield break;
             }
 
             if (Character != null)
@@ -146,6 +200,9 @@ namespace MilkIt.NPCs
                 Character.ShowCup(false);
             }
             else yield return new WaitForSeconds(cafe.drinkingSeconds);
+            // Pay only once the drink is finished.
+            AmountPaid = cafe.Pay(this);
+            if (indicator != null) indicator.ShowPaid(AmountPaid);
             DoneDrinking = true;
 
             // Friends leave together.
@@ -156,6 +213,12 @@ namespace MilkIt.NPCs
                 yield return null;
             }
 
+            State = CustomerState.Leaving;
+            yield return LeaveCafe(true);
+        }
+
+        IEnumerator LeaveCafe(bool completed)
+        {
             if (Character != null) yield return StandUp();
             else
             {
@@ -166,7 +229,6 @@ namespace MilkIt.NPCs
             seat.Release(this);
             agent.enabled = true;
             agent.Warp(seat.approach.position);
-            State = CustomerState.Leaving;
             if (!MoveTo(cafe.exit.position)) yield break;
             // Friends leave side by side, so anywhere close to the exit counts.
             while (!Arrived(1f))
@@ -175,14 +237,15 @@ namespace MilkIt.NPCs
                 yield return null;
             }
             finished = true;
-            cafe.Remove(this, true);
+            cafe.Remove(this, completed);
             Destroy(gameObject);
         }
 
         // Seated customers chat when someone else from their party is at the table.
         void SeatedPose()
         {
-            var talk = Party != null && Party.SeatedCount > 1;
+            // Frustrated customers stop chatting.
+            var talk = Party != null && Party.SeatedCount > 1 && !Frustrated;
             var wanted = talk ? CustomerAnimator.SitTalk : CustomerAnimator.SitIdle;
             var info = Character.Animator.GetCurrentAnimatorStateInfo(0);
             if (info.shortNameHash != wanted && !Character.Animator.IsInTransition(0) &&
@@ -276,7 +339,7 @@ namespace MilkIt.NPCs
         bool TimedOut()
         {
             // A customer waiting at its queue marker is allowed to wait indefinitely.
-            if (Time.time - moveStarted < 45f || Arrived(State == CustomerState.Leaving ? 1f : 0.15f)) return false;
+            if (Time.time - moveStarted < 45f || Arrived(State == CustomerState.Leaving || State == CustomerState.LeavingAngry ? 1f : 0.15f)) return false;
             Abort("was blocked for 45 seconds");
             return true;
         }
@@ -299,6 +362,7 @@ namespace MilkIt.NPCs
 
         void OnDestroy()
         {
+            if (indicator != null) Destroy(indicator.gameObject);
             if (seat != null) seat.Release(this);
             if (cafe != null) cafe.Remove(this, false);
             Party?.Members.Remove(this);
