@@ -25,6 +25,14 @@ namespace MilkIt.Machine.CoffeeMachine{
             if (fluidSource != null) 
             {   
                 fluidSource.SetFlowScale(angle);
+                if (angle > 0f)
+                {
+                    fluidSource.Dispense();
+                }
+                else 
+                {
+                    fluidSource.StopFlow();
+                }
                 if (alternativeFluidSource != null) alternativeFluidSource.SetFlowScale(0);
                 return;
             }
