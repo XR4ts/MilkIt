@@ -9,6 +9,10 @@ namespace MilkIt.NPCs
         public GameObject waitingGroup;
         public Transform fillPivot;
         public Renderer fillRenderer;
+        [Tooltip("Picture of the ordered drink, left of the bar.")]
+        public Renderer drinkIcon;
+        [Tooltip("The ordered drink's name, under the bar.")]
+        public TextMesh drinkName;
         public TextMesh label;
         public Color calm = new Color(0.3f, 0.85f, 0.35f);
         public Color warning = new Color(1f, 0.8f, 0.2f);
@@ -24,6 +28,7 @@ namespace MilkIt.NPCs
         bool waiting;
         Vector3 popupOffset;
         static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+        static readonly int BaseMap = Shader.PropertyToID("_BaseMap");
 
         public void Attach(Transform target)
         {
@@ -50,6 +55,17 @@ namespace MilkIt.NPCs
                 label.text = frustrated ? ("! " + seconds).Trim() : seconds;
                 label.color = frustrated ? angry : Color.white;
             }
+        }
+
+        public void SetDrinkIcon(Texture icon, string name = null)
+        {
+            if (drinkName != null) drinkName.text = name ?? "";
+            if (drinkIcon == null) return;
+            drinkIcon.gameObject.SetActive(icon != null);
+            if (icon == null) return;
+            var iconBlock = new MaterialPropertyBlock();
+            iconBlock.SetTexture(BaseMap, icon);
+            drinkIcon.SetPropertyBlock(iconBlock);
         }
 
         public void ShowPaid(int amount) => Popup("+" + amount, paid);

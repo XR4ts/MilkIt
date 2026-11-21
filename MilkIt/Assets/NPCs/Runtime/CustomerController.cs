@@ -1,10 +1,11 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace MilkIt.NPCs
 {
-    public enum CustomerState { Entering, Queueing, Ordering, WalkingToSeat, WaitingForDrink, Drinking, WaitingForParty, Leaving, LeavingAngry }
+    public enum CustomerState { Entering, Queueing, Ordering, WalkingToSeat, WaitingForDrink, Drinking, WaitingForParty, Leaving, LeavingAngry, WaitingAtTill }
 
     [RequireComponent(typeof(NavMeshAgent))]
     public sealed class CustomerController : MonoBehaviour
@@ -38,6 +39,8 @@ namespace MilkIt.NPCs
         float startDelay;
         Vector3 destination;
         CustomerPatienceIndicator indicator;
+        CustomerOrderBubble bubble;
+        CustomerHandOffZone handOff;
 
         const float SeatWalkSpeed = 0.7f;
         const float SipInterval = 3.2f;
@@ -75,6 +78,52 @@ namespace MilkIt.NPCs
             var head = Character != null ? Character.Animator.GetBoneTransform(HumanBodyBones.Head) : null;
             indicator.Attach(head != null ? head : body != null ? body : transform);
             if (head == null) indicator.heightAboveHead = 1.3f;
+        }
+
+        public void AttachOrderBubble(CustomerOrderBubble prefab)
+        {
+            if (prefab == null) return;
+            bubble = Instantiate(prefab, transform.parent);
+            var head = Character != null ? Character.Animator.GetBoneTransform(HumanBodyBones.Head) : null;
+            bubble.Attach(head != null ? head : body != null ? body : transform);
+            if (head == null) { bubble.heightAtTill = 1.4f; bubble.heightSeated = 1.9f; }
+        }
+
+        // A solid collider so the player can select this customer with a controller ray, poke or mouse click.
+        public void MakeSelectable()
+        {
+            var collider = gameObject.AddComponent<CapsuleCollider>();
+            collider.center = Vector3.up * 0.9f;
+            collider.height = 1.8f;
+            collider.radius = 0.3f;
+            var interactable = gameObject.AddComponent<XRSimpleInteractable>();
+            interactable.selectEntered.AddListener(_ => { if (cafe != null) cafe.TakeOrder(this); });
+        }
+
+        // Seated and waiting: an invisible zone over the customer and their half of the table, so the player can
+        // hand them a drink (see CafeCustomerSystem.DrinkHandedOver).
+        void SetHandOffZone(bool active)
+        {
+            if (handOff == null)
+            {
+                if (!active) return;
+                var zone = new GameObject("Hand-off zone");
+                zone.transform.SetParent(transform, false);
+                zone.transform.localPosition = new Vector3(0f, 0.85f, 0f);
+                var box = zone.AddComponent<BoxCollider>();
+                box.size = new Vector3(0.6f, 1.1f, 0.45f); // stops at the table's middle, so facing seats don't overlap
+                handOff = zone.AddComponent<CustomerHandOffZone>();
+                handOff.Init(this, cafe);
+            }
+            handOff.Enable(active);
+        }
+
+        // The player took this customer's order at the till.
+        public bool TryTakeOrder()
+        {
+            if (State != CustomerState.WaitingAtTill) return false;
+            State = CustomerState.Ordering;
+            return true;
         }
 
         public void Begin(CafeCustomerSystem owner, CustomerSeat reservedSeat, int orderId, string drink,
@@ -128,7 +177,15 @@ namespace MilkIt.NPCs
             }
             agent.isStopped = true;
             transform.rotation = cafe.QueueTarget(this).rotation;
+            if (cafe.requireOrderClick)
+            {
+                // Wait at the register until the player clicks them.
+                State = CustomerState.WaitingAtTill;
+                if (bubble != null) bubble.ShowWaitingToOrder();
+                while (State == CustomerState.WaitingAtTill) yield return null;
+            }
             State = CustomerState.Ordering;
+            if (bubble != null) bubble.ShowOrder(Drink, cafe.IconOf(Drink), false);
             if (Character != null) Character.Talking = true;
             yield return new WaitForSeconds(cafe.orderSeconds);
             if (Character != null) Character.Talking = false;
@@ -160,6 +217,15 @@ namespace MilkIt.NPCs
             }
 
             State = CustomerState.WaitingForDrink;
+            SetHandOffZone(true);
+            // Seated: the drink picture moves next to the patience bar; the bubble is only for the till.
+            var icon = cafe.IconOf(Drink);
+            if (indicator != null)
+            {
+                indicator.SetDrinkIcon(icon, Drink);
+                if (bubble != null) bubble.Hide();
+            }
+            else if (bubble != null) bubble.ShowOrder(Drink, icon, true);
             var patience = cafe.patienceSeconds;
             var waitStarted = Time.time;
             while (State == CustomerState.WaitingForDrink)
@@ -176,7 +242,9 @@ namespace MilkIt.NPCs
                 yield return null;
             }
             Frustrated = false;
+            SetHandOffZone(false);
             if (indicator != null) indicator.Hide();
+            if (bubble != null) bubble.Hide();
 
             if (State == CustomerState.LeavingAngry)
             {
@@ -317,7 +385,8 @@ namespace MilkIt.NPCs
         void Update()
         {
             if (finished || cafe == null || cafe.entranceDoor == null || agent == null ||
-                !agent.enabled || !agent.isOnNavMesh || State == CustomerState.Ordering) return;
+                !agent.enabled || !agent.isOnNavMesh || State == CustomerState.Ordering ||
+                State == CustomerState.WaitingAtTill) return;
             agent.isStopped = cafe.entranceDoor.ShouldWait(transform.position);
         }
 
@@ -363,6 +432,7 @@ namespace MilkIt.NPCs
         void OnDestroy()
         {
             if (indicator != null) Destroy(indicator.gameObject);
+            if (bubble != null) Destroy(bubble.gameObject);
             if (seat != null) seat.Release(this);
             if (cafe != null) cafe.Remove(this, false);
             Party?.Members.Remove(this);
