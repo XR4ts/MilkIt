@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: CoffeeGrain
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Fluids.FluidType
   displayName: CoffeeGrain
-  color: {r: 0.36, g: 0.21, b: 0.1, a: 1}
+  color: {r: 0.31132078, g: 0.19041476, b: 0.1013261, a: 1}
   state: 1
   material: {fileID: 2100000, guid: 4311ee7e6f6daa00b862d583d99cb47b, type: 2}
