@@ -10,9 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c1d96d4d398c2757a8bf1ec194933d2, type: 3}
-  m_Name: Coffee
+  m_Name: Milk
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Fluids.FluidType
-  displayName: Coffee
-  color: {r: 0.23, g: 0.12, b: 0.05, a: 1}
+  displayName: Milk
+  color: {r: 1, g: 1, b: 1, a: 1}
+  colorStrength: 0.7
   state: 0
   material: {fileID: 2100000, guid: 05d5c30d0c4f745efa08c9fa2784de62, type: 2}
+  qualityLossModel: {fileID: 11400000, guid: 74cf13a5c96c5b141a69a8bdca45caeb, type: 2}

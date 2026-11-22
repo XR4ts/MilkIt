@@ -10,9 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c1d96d4d398c2757a8bf1ec194933d2, type: 3}
-  m_Name: SteamedMilk
+  m_Name: Coffee
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Fluids.FluidType
-  displayName: SteamedMilk
-  color: {r: 0.8773585, g: 0.84465116, b: 0.6745728, a: 1}
+  displayName: Coffee
+  color: {r: 0.23, g: 0.12, b: 0.05, a: 1}
+  colorStrength: 0.1
   state: 0
   material: {fileID: 2100000, guid: 05d5c30d0c4f745efa08c9fa2784de62, type: 2}
+  qualityLossModel: {fileID: 11400000, guid: ba410e0f9f9bff046905fb1c081ebf2f, type: 2}

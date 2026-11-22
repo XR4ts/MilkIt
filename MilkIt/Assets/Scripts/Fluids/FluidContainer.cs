@@ -71,6 +71,8 @@ namespace MilkIt.Fluids
 
         public float SurfaceWorldY => Opening.position.y - WorldDepth * (isDrain ? 1f : 1f - FillFraction);
         protected MeshCollider fillCollider;
+        // for quality control
+        internal bool isRefrigerated = false;
 
         void Awake()
         {
@@ -194,6 +196,11 @@ namespace MilkIt.Fluids
         void Update()
         {
             if (total <= 0f) return;
+
+            foreach (FluidLayer layer in layers)
+            {
+                layer.TickQuality(this, Time.deltaTime);
+            }
 
             Vector3 gravity = Opening.InverseTransformDirection(Vector3.down);
             if ((gravity - fillGravity).sqrMagnitude > 1e-6f) fillDirty = true;

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 693feb173b487564880d7e9aa6d69709, type: 3}
+  m_Name: Caffe Latte
+  m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Machine.DrinkGrader.DrinkType
+  name: Caffe Latte
+  ingredients:
+  - type: {fileID: 11400000, guid: 62160502f1fcb835f9148baf431ee8b1, type: 2}
+    ingredientPercentageInDrink: 0.2
+  - type: {fileID: 11400000, guid: 2fb006ed33c92cd4cbedefcc05840c2e, type: 2}
+    ingredientPercentageInDrink: 0.78
+  - type: {fileID: 11400000, guid: f794ab9a9eafbc0429b1801deae7e3d2, type: 2}
+    ingredientPercentageInDrink: 0.02

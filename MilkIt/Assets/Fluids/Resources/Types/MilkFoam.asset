@@ -10,9 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c1d96d4d398c2757a8bf1ec194933d2, type: 3}
-  m_Name: Water
+  m_Name: MilkFoam
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Fluids.FluidType
-  displayName: Water
-  color: {r: 0.55, g: 0.8, b: 1, a: 0.101960786}
+  displayName: MilkFoam
+  color: {r: 1, g: 1, b: 1, a: 1}
+  colorStrength: 0.4
   state: 0
   material: {fileID: 2100000, guid: 05d5c30d0c4f745efa08c9fa2784de62, type: 2}
+  qualityLossModel: {fileID: 0}
