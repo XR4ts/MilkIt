@@ -163,7 +163,8 @@ public class WristMenuController : MonoBehaviour
 
     public void ResetObjects()
     {
-        // TODO: object reset logic
+        // TODO: object reset logic instead whole scene
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
