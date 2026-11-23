@@ -4,23 +4,28 @@ using MilkIt.Machine;
 using System.Collections.Generic;
 
 namespace MilkIt.Machine.DrinkGrader{
-    public class DrinkGrader : MonoBehaviour
+    public static class DrinkGrader
     {
-        private DrinkType[] drinkTypes;
-        private void Start()
+        private static DrinkType[] drinkTypes;
+        private static void EnsureLoaded()
         {
-            drinkTypes = Resources.LoadAll<DrinkType>("DrinkTypes");
-        }
-        private void OnTriggerEnter(Collider other)
-        {
-            if (!other.TryGetComponent<FluidContainer>(out FluidContainer fluidContainer))
-                return;
-            gradeDrinkError(fluidContainer);
+            if (drinkTypes == null)
+            {
+                drinkTypes = Resources.LoadAll<DrinkType>("DrinkTypes");
 
+                if (drinkTypes.Length == 0)
+                {
+                    Debug.LogWarning(
+                        "No DrinkTypes found in Resources/DrinkTypes!"
+                    );
+                }
+            }
         }
 
-        void gradeDrink(FluidContainer fluidContainer)
+        public static (float drinkScore, DrinkType predictedDrink) GradeDrink(FluidContainer fluidContainer)
         {
+            EnsureLoaded();
+
             DrinkType bestGuess = null;
             float bestScore = -99999f;
             foreach (DrinkType drink in drinkTypes)
@@ -37,28 +42,8 @@ namespace MilkIt.Machine.DrinkGrader{
                 Debug.Log("Something went wrong, probably there are no DrinkTypes defined!");
             }
             float drinkScore = FluidMix.BlendQualities(fluidContainer.Layers) * bestScore;
-            // Debug.Log($"Drink is probably {bestGuess} with guessing score: {bestScore}. Drink score: {drinkScore}");
-        }
-
-        void gradeDrinkError(FluidContainer fluidContainer)
-        {
-            DrinkType bestGuess = null;
-            float smallestError = 99999f;
-            foreach (DrinkType drink in drinkTypes)
-            {
-                float err = drink.MatchError(fluidContainer.Layers, fluidContainer.Total);
-                Debug.Log($"{drink} : {err}");
-                if (err < smallestError)
-                {
-                    smallestError = err;
-                    bestGuess = drink;
-                }
-            }
-            if (bestGuess == null)
-            {
-                Debug.Log("Something went wrong, probably there are no DrinkTypes defined!");
-            }
-            // Debug.Log($"Drink is probably {bestGuess} with error: {smallestError}");
+            Debug.Log($"Drink is probably {bestGuess} with guessing score: {bestScore}. Drink score: {drinkScore}");
+            return (drinkScore, bestGuess);
         }
     }
 }

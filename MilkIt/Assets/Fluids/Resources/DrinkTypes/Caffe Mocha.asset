@@ -13,4 +13,6 @@ MonoBehaviour:
   m_Name: Caffe Mocha
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Machine.DrinkGrader.DrinkType
   name: Caffe Latte
+  price: 8
   ingredients: []
+  expectedDrinkMililiters: 0

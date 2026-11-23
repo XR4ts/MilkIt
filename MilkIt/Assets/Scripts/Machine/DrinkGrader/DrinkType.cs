@@ -5,12 +5,16 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace MilkIt.Machine.DrinkGrader{
+    // TODO: Customers now accept correct drink, and pay according to the quality. Need to work on detection, so far cappucino works great, everything else is either not detected
+    // correctly or is given an really low score for no reason. Incorprate expected drink size to make sure you cant give a drop of coffee and have it count as an espresso.
 
     [CreateAssetMenu(menuName = "MilkIt/Drink Type")]
     public class DrinkType : ScriptableObject
     {
         public string name;
+        public int price;
         public List<DrinkIngredient> ingredients;
+        public float expectedDrinkMililiters;
         public bool RoughlyMatches(List<FluidLayer> fluidLayers, float totalFluids, float acceptableError = 0.5f)
         {
             return false;

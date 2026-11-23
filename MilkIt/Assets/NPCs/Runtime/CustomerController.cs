@@ -45,6 +45,8 @@ namespace MilkIt.NPCs
         const float SeatWalkSpeed = 0.7f;
         const float SipInterval = 3.2f;
 
+        private int setToPay = 0;
+
         // Replaces the placeholder capsule with a character visual (a generated Humanoid prefab).
         public void AttachCharacter(GameObject characterPrefab, float walkSpeed)
         {
@@ -269,7 +271,7 @@ namespace MilkIt.NPCs
             }
             else yield return new WaitForSeconds(cafe.drinkingSeconds);
             // Pay only once the drink is finished.
-            AmountPaid = cafe.Pay(this);
+            AmountPaid = cafe.Pay(this, setToPay);
             if (indicator != null) indicator.ShowPaid(AmountPaid);
             DoneDrinking = true;
 
@@ -413,10 +415,11 @@ namespace MilkIt.NPCs
             return true;
         }
 
-        public bool TryReceiveDrink(string drink)
+        public bool TryReceiveDrink(string drink, int price)
         {
             if (State != CustomerState.WaitingForDrink || drink != Drink) return false;
             State = CustomerState.Drinking;
+            setToPay = price;
             return true;
         }
 

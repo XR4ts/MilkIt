@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Espresso
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Machine.DrinkGrader.DrinkType
   name: Espresso
+  price: 3
   ingredients:
   - type: {fileID: 11400000, guid: 62160502f1fcb835f9148baf431ee8b1, type: 2}
     ingredientPercentageInDrink: 1
+  expectedDrinkMililiters: 0

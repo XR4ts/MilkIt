@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Americano
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Machine.DrinkGrader.DrinkType
   name: Americano
+  price: 4
   ingredients:
   - type: {fileID: 11400000, guid: 62160502f1fcb835f9148baf431ee8b1, type: 2}
     ingredientPercentageInDrink: 0.2
   - type: {fileID: 11400000, guid: 5cb589cc912b82e9bbdd89029349dd2b, type: 2}
     ingredientPercentageInDrink: 0.8
+  expectedDrinkMililiters: 0

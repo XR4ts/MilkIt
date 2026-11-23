@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Caffe Latte
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Machine.DrinkGrader.DrinkType
   name: Caffe Latte
+  price: 5
   ingredients:
   - type: {fileID: 11400000, guid: 62160502f1fcb835f9148baf431ee8b1, type: 2}
     ingredientPercentageInDrink: 0.2
@@ -20,3 +21,4 @@ MonoBehaviour:
     ingredientPercentageInDrink: 0.78
   - type: {fileID: 11400000, guid: f794ab9a9eafbc0429b1801deae7e3d2, type: 2}
     ingredientPercentageInDrink: 0.02
+  expectedDrinkMililiters: 0
