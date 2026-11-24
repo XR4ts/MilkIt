@@ -8208,6 +8208,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Speaker_Right
       objectReference: {fileID: 0}
+    - target: {fileID: 3441762775603002508, guid: 806b3b40b5d28a343a63aa97ae7883f8, type: 3}
+      propertyPath: m_Volume
+      value: 0.7
+      objectReference: {fileID: 0}
     - target: {fileID: 5844625887297519336, guid: 806b3b40b5d28a343a63aa97ae7883f8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.85
@@ -13604,6 +13608,10 @@ PrefabInstance:
     - target: {fileID: 1301427242366053912, guid: 806b3b40b5d28a343a63aa97ae7883f8, type: 3}
       propertyPath: m_Name
       value: Speaker_Left
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441762775603002508, guid: 806b3b40b5d28a343a63aa97ae7883f8, type: 3}
+      propertyPath: m_Volume
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 5844625887297519336, guid: 806b3b40b5d28a343a63aa97ae7883f8, type: 3}
       propertyPath: m_LocalPosition.x
