@@ -6814,7 +6814,7 @@ AudioSource:
   m_GameObject: {fileID: 843567218}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -9119694757476295241, guid: 8075845910e8ea541b8cbe3384127516, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
@@ -9883,7 +9883,7 @@ AudioSource:
   m_GameObject: {fileID: 1095259187}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -9119694757476295241, guid: 8075845910e8ea541b8cbe3384127516, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
@@ -14754,7 +14754,7 @@ AudioSource:
   m_GameObject: {fileID: 1670255933}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -9119694757476295241, guid: 8075845910e8ea541b8cbe3384127516, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
@@ -15119,7 +15119,7 @@ AudioSource:
   m_GameObject: {fileID: 1670656857}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -9119694757476295241, guid: 8075845910e8ea541b8cbe3384127516, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
@@ -17808,7 +17808,7 @@ AudioSource:
   m_GameObject: {fileID: 2106035614}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -9119694757476295241, guid: 8075845910e8ea541b8cbe3384127516, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
@@ -75198,6 +75198,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 544416667065609171, guid: 069605664bb33ac4ea751394d50f53e1, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: -9119694757476295241, guid: 8075845910e8ea541b8cbe3384127516, type: 2}
     - target: {fileID: 555006890315128970, guid: 069605664bb33ac4ea751394d50f53e1, type: 3}
       propertyPath: capacity
       value: 60
@@ -75258,6 +75262,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Willoughsby espresso
       objectReference: {fileID: 0}
+    - target: {fileID: 5357054612918011213, guid: 069605664bb33ac4ea751394d50f53e1, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: -9119694757476295241, guid: 8075845910e8ea541b8cbe3384127516, type: 2}
     - target: {fileID: 6052023040085745377, guid: 069605664bb33ac4ea751394d50f53e1, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.1697824
@@ -89038,7 +89046,7 @@ AudioSource:
   m_GameObject: {fileID: 9074634178725325832}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -9119694757476295241, guid: 8075845910e8ea541b8cbe3384127516, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 36ac9803b21fee146bdf06d88d07c146, type: 3}
   m_PlayOnAwake: 0
