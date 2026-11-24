@@ -471,6 +471,30 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8525384921271413732, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8525384921271413732, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8525384921271413732, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8525384921271413732, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8525384921271413732, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8525384921271413732, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8730666187090438845, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -500,6 +524,99 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+--- !u!114 &9583687 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8371481078690214173, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+  m_PrefabInstance: {fileID: 9583686}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &9583688 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1595834198175557003, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+  m_PrefabInstance: {fileID: 9583686}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!114 &9583689 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 599342732459853579, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+  m_PrefabInstance: {fileID: 9583686}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!114 &9583690 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4379598717126405222, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+  m_PrefabInstance: {fileID: 9583686}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Slider
+--- !u!114 &9583691 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1462505167403563820, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+  m_PrefabInstance: {fileID: 9583686}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &9583692 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8561024495788560211, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+  m_PrefabInstance: {fileID: 9583686}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Slider
+--- !u!114 &9583693 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 946612219023615925, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+  m_PrefabInstance: {fileID: 9583686}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!1 &9583694 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1752350018573761297, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+  m_PrefabInstance: {fileID: 9583686}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9583695 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8943580986225636787, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
+  m_PrefabInstance: {fileID: 9583686}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Slider
 --- !u!1 &56104765
 GameObject:
   m_ObjectHideFlags: 0
@@ -807,6 +924,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1717954561962503725, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1927376780}
+    - targetCorrespondingSourceObject: {fileID: 1717954561962503725, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1927376783}
+    - targetCorrespondingSourceObject: {fileID: 1717954561962503725, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1927376782}
+    - targetCorrespondingSourceObject: {fileID: 1717954561962503725, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1927376781}
   m_SourcePrefab: {fileID: 100100000, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
 --- !u!4 &1208464064 stripped
 Transform:
@@ -1037,8 +1163,65 @@ MonoBehaviour:
   vanishFadeDuration: 0.5
   backFromSettingsButton: {fileID: 199024118}
   quitButton: {fileID: 242176084}
+  audioPanel: {fileID: 9583694}
+  audioButton: {fileID: 9583688}
+  backFromAudioButton: {fileID: 9583689}
   offsetFromHand: {x: 0, y: 0.12, z: 0}
   startOpen: 1
+--- !u!114 &1927376781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927376773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9ffd642e0154384bb1bce3fc6f143aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Audio.VolumeSlider
+  mixer: {fileID: 24100000, guid: 8075845910e8ea541b8cbe3384127516, type: 2}
+  exposedParameter: SFXVolume
+  slider: {fileID: 9583695}
+  label: {fileID: 9583687}
+  labelName: Effects
+  defaultValue: 1
+--- !u!114 &1927376782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927376773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9ffd642e0154384bb1bce3fc6f143aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Audio.VolumeSlider
+  mixer: {fileID: 24100000, guid: 8075845910e8ea541b8cbe3384127516, type: 2}
+  exposedParameter: MusicVolume
+  slider: {fileID: 9583690}
+  label: {fileID: 9583691}
+  labelName: Music
+  defaultValue: 1
+--- !u!114 &1927376783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927376773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9ffd642e0154384bb1bce3fc6f143aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Audio.VolumeSlider
+  mixer: {fileID: 24100000, guid: 8075845910e8ea541b8cbe3384127516, type: 2}
+  exposedParameter: MasterVolume
+  slider: {fileID: 9583692}
+  label: {fileID: 9583693}
+  labelName: Master
+  defaultValue: 1
 --- !u!114 &1972813057 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8135114592732805350, guid: 305739bb65f880b42aff94e1af78c49a, type: 3}
