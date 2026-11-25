@@ -909,6 +909,7 @@ GameObject:
   - component: {fileID: 4835938151800552891}
   - component: {fileID: 324945911481990205}
   - component: {fileID: 2270485510073036196}
+  - component: {fileID: 568124409618901946}
   m_Layer: 0
   m_Name: Cup Large
   m_TagString: Untagged
@@ -959,20 +960,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45f0dc49063ae6484bbf18d53a4938fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Fluids.FluidContainer
-  capacity: 1000
-  layers:
-  - type: {fileID: 11400000, guid: 62160502f1fcb835f9148baf431ee8b1, type: 2}
-    amount: 0
-    quality: 0
-    isHot: 0
-  - type: {fileID: 11400000, guid: 2fb006ed33c92cd4cbedefcc05840c2e, type: 2}
-    amount: 0
-    quality: 0
-    isHot: 0
-  - type: {fileID: 0}
-    amount: 0
-    quality: 0
-    isHot: 0
+  capacity: 600
+  layers: []
   opening: {fileID: 3326261684896799114}
   openingRadius: 0.045
   depth: 0.08
@@ -1179,6 +1168,18 @@ CapsuleCollider:
   m_Height: 0.09362381
   m_Direction: 1
   m_Center: {x: 0, y: 0.044156168, z: 0}
+--- !u!114 &568124409618901946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4220413038688895615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08722835dcdd0b14895f1fabe9b07495, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Machine.Resetable
 --- !u!1 &4279658933548328872
 GameObject:
   m_ObjectHideFlags: 0

@@ -15,38 +15,12 @@ namespace MilkIt.Machine.DrinkGrader{
         public int price;
         public List<DrinkIngredient> ingredients;
         public float expectedDrinkMililiters;
-        public bool RoughlyMatches(List<FluidLayer> fluidLayers, float totalFluids, float acceptableError = 0.5f)
-        {
-            return false;
-        }
-
-        public float MatchError(IReadOnlyList<FluidLayer> fluidLayers, float totalFluids)
-        {
-            float totalError = 0;
-            foreach (DrinkIngredient ing in ingredients)
-            {
-                if (!fluidLayers.Any(lay => lay.type == ing.type)) totalError += 1;
-            }
-            foreach (FluidLayer layer in fluidLayers)
-            {
-                DrinkIngredient matchingIngredient = ingredients.FirstOrDefault(ing => ing.type == layer.type);
-                if (matchingIngredient == null)
-                {
-                    totalError += 1;
-                    continue;
-                }
-                Debug.Log($"{layer}");
-                Debug.Log($"Taking up {layer.amount} / {totalFluids} percentage of : {layer.amount / totalFluids}");
-                Debug.Log($"Expected {matchingIngredient.ingredientPercentageInDrink}");
-                float diff = Mathf.Abs((layer.amount / totalFluids) - matchingIngredient.ingredientPercentageInDrink);
-                Debug.Log($"Gives error {diff}");
-                totalError += diff;
-            }
-            return totalError;
-        }
+        public float volumeImportance = 0.3f;
+        public Texture2D icon;
         public float MatchScore(IReadOnlyList<FluidLayer> fluidLayers, float totalFluids)
         {
             float totalError = 0;
+            // float uncoutableError = 0f;
             foreach (DrinkIngredient ing in ingredients)
             {
                 if (!fluidLayers.Any(lay => lay.type == ing.type)) totalError += 1;
@@ -60,8 +34,9 @@ namespace MilkIt.Machine.DrinkGrader{
                     continue;
                 }
                 float diff = Mathf.Abs((layer.amount / totalFluids) - matchingIngredient.ingredientPercentageInDrink);
-                Debug.Log($"Counting {layer}: {diff}");
-                totalError += diff;
+                float volumeDiff = Mathf.Abs(totalFluids - expectedDrinkMililiters) / Mathf.Max(totalFluids, expectedDrinkMililiters);
+                totalError += diff + volumeDiff * volumeImportance;
+                // uncoutableError += volumeDiff;
             }
             if (totalError > 3) return 0;
             return (3 - totalError) / 3;
