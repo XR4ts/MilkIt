@@ -18,3 +18,4 @@ MonoBehaviour:
   state: 0
   material: {fileID: 2100000, guid: 05d5c30d0c4f745efa08c9fa2784de62, type: 2}
   qualityLossModel: {fileID: 11400000, guid: ba410e0f9f9bff046905fb1c081ebf2f, type: 2}
+  shouldBeHot: 1

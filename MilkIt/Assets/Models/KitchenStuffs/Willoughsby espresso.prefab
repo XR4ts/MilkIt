@@ -36,7 +36,7 @@ Transform:
   m_GameObject: {fileID: 1058865510965618360}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: 0.0008997917, y: 0.44230002, z: -0.26799998}
+  m_LocalPosition: {x: -0.0018, y: 0.4425, z: -0.2686}
   m_LocalScale: {x: 100.00003, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -360,14 +360,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45f0dc49063ae6484bbf18d53a4938fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Fluids.FluidContainer
-  capacity: 156
+  capacity: 90
   layers: []
   opening: {fileID: 1656075048199922006}
   openingRadius: 0.04
   depth: 0.035
   canReceive: 1
   acceptedTypes:
-  - {fileID: 11400000, guid: ccfcb5b1b4aa4202c9dd8ba2852e9f2a, type: 2}
+  - {fileID: 11400000, guid: e9c1ad4b35715364f81a5cb4e2e77c11, type: 2}
   isDrain: 0
   scoopable: 1
   canPour: 1
@@ -388,6 +388,7 @@ MonoBehaviour:
   onDrained:
     m_PersistentCalls:
       m_Calls: []
+  isRefrigerated: 0
 --- !u!114 &5047598039126549540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -406,8 +407,8 @@ MonoBehaviour:
   startOn: 1
   doseAmount: 40
   supply: {fileID: 4242662639565128910}
-  supplyType: {fileID: 0}
-  supplyPerOutput: 0
+  supplyType: {fileID: 11400000, guid: e9c1ad4b35715364f81a5cb4e2e77c11, type: 2}
+  supplyPerOutput: 1
   onStarted:
     m_PersistentCalls:
       m_Calls: []
@@ -883,7 +884,7 @@ Transform:
   m_GameObject: {fileID: 1874000346790621880}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: -0.0003, y: 0.4404, z: 0.2678}
+  m_LocalPosition: {x: -0.0003, y: 0.4422, z: 0.2678}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1185,14 +1186,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45f0dc49063ae6484bbf18d53a4938fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Fluids.FluidContainer
-  capacity: 156
+  capacity: 150
   layers: []
   opening: {fileID: 4888292989880034020}
   openingRadius: 0.04
   depth: 0.035
   canReceive: 1
   acceptedTypes:
-  - {fileID: 11400000, guid: ccfcb5b1b4aa4202c9dd8ba2852e9f2a, type: 2}
+  - {fileID: 11400000, guid: e9c1ad4b35715364f81a5cb4e2e77c11, type: 2}
   isDrain: 0
   scoopable: 1
   canPour: 1
@@ -1213,6 +1214,7 @@ MonoBehaviour:
   onDrained:
     m_PersistentCalls:
       m_Calls: []
+  isRefrigerated: 0
 --- !u!114 &1275974226296106374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1228,11 +1230,11 @@ MonoBehaviour:
   fluidType: {fileID: 11400000, guid: 62160502f1fcb835f9148baf431ee8b1, type: 2}
   flowRate: 60
   spout: {fileID: 0}
-  startOn: 1
-  doseAmount: 40
+  startOn: 0
+  doseAmount: 80
   supply: {fileID: 555006890315128970}
-  supplyType: {fileID: 0}
-  supplyPerOutput: 0
+  supplyType: {fileID: 11400000, guid: e9c1ad4b35715364f81a5cb4e2e77c11, type: 2}
+  supplyPerOutput: 1
   onStarted:
     m_PersistentCalls:
       m_Calls: []
@@ -1612,6 +1614,7 @@ GameObject:
   - component: {fileID: 8471836632104962090}
   - component: {fileID: 4117203781305496434}
   - component: {fileID: 1294856758318106641}
+  - component: {fileID: 1174137753437667942}
   m_Layer: 0
   m_Name: Milk-transforrmer-R
   m_TagString: Untagged
@@ -1673,6 +1676,22 @@ MonoBehaviour:
   toFluid: {fileID: 11400000, guid: 2fb006ed33c92cd4cbedefcc05840c2e, type: 2}
   transformScale: 1
   takenScale: 1.2
+--- !u!114 &1174137753437667942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2971658734499159806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d984a2a3fa2d0cf4abb0b78beef0c70f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Machine.CoffeeMachine.LiquidChanger
+  fromFluid: {fileID: 11400000, guid: 5cb589cc912b82e9bbdd89029349dd2b, type: 2}
+  toFluid: {fileID: 11400000, guid: 853716373a2d92041927da927db56e29, type: 2}
+  transformScale: 1
+  takenScale: 1
 --- !u!1 &3546013463188863897
 GameObject:
   m_ObjectHideFlags: 0
@@ -2335,7 +2354,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6052023040085745377}
   m_Layer: 0
-  m_Name: Willoughsby espresso_ready
+  m_Name: Willoughsby espresso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2350,7 +2369,7 @@ Transform:
   m_GameObject: {fileID: 5201425643242639070}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.1697824, y: 0.378, z: 0.68424886}
+  m_LocalPosition: {x: 3.1697824, y: 0.606, z: 0.68424886}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2413,7 +2432,7 @@ GameObject:
   - component: {fileID: 1873203685502216705}
   - component: {fileID: 3115964257136264993}
   m_Layer: 0
-  m_Name: glass
+  m_Name: Glass
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2502,6 +2521,7 @@ GameObject:
   - component: {fileID: 8837397720899718565}
   - component: {fileID: 9046501663286319252}
   - component: {fileID: 5449790890339125508}
+  - component: {fileID: 1453547007428138779}
   m_Layer: 0
   m_Name: Milk-transforrmer-L
   m_TagString: Untagged
@@ -2563,6 +2583,22 @@ MonoBehaviour:
   toFluid: {fileID: 11400000, guid: 2fb006ed33c92cd4cbedefcc05840c2e, type: 2}
   transformScale: 1
   takenScale: 1.2
+--- !u!114 &1453547007428138779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7890497985713620445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d984a2a3fa2d0cf4abb0b78beef0c70f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Machine.CoffeeMachine.LiquidChanger
+  fromFluid: {fileID: 11400000, guid: 5cb589cc912b82e9bbdd89029349dd2b, type: 2}
+  toFluid: {fileID: 11400000, guid: 853716373a2d92041927da927db56e29, type: 2}
+  transformScale: 1
+  takenScale: 1
 --- !u!1 &8781422735910179755
 GameObject:
   m_ObjectHideFlags: 0
@@ -2576,7 +2612,7 @@ GameObject:
   - component: {fileID: 985295868098134900}
   - component: {fileID: 2222639638592322962}
   m_Layer: 0
-  m_Name: base
+  m_Name: Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

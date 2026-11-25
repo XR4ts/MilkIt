@@ -16,6 +16,7 @@ namespace MilkIt.Fluids
         [Tooltip("Optional. Material for streams, fill levels and puddles of this type. Tinted with 'color'.")]
         public Material material;
         public QualityLossModel qualityLossModel;
+        public bool shouldBeHot = false;
 
         public bool IsGranular => state == FluidState.Granular;
     }

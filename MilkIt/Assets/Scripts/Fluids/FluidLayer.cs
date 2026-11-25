@@ -11,6 +11,7 @@ namespace MilkIt.Fluids
         public float amount;
         
         public float quality;
+        public bool isHot;
         private float lastTick;
         public FluidLayer(FluidType type, float amount)
         {
@@ -18,6 +19,7 @@ namespace MilkIt.Fluids
             this.amount = amount;
             this.quality = 1f;
             this.lastTick = type.qualityLossModel != null ? type.qualityLossModel.tickDelay : 0f;
+            this.isHot = type.shouldBeHot;
         }
         public void TickQuality(FluidContainer fluidContainer, float deltaTime)
         {
@@ -29,6 +31,7 @@ namespace MilkIt.Fluids
             }
             lastTick = type.qualityLossModel.tickDelay;
             quality = type.qualityLossModel.updateQuality(fluidContainer, quality);
+            if (quality < 0.7) isHot = false;
         }
     }
 

@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: MilkFoam
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Fluids.FluidType
   displayName: MilkFoam
-  color: {r: 1, g: 1, b: 1, a: 1}
+  color: {r: 0.9, g: 0.9, b: 1, a: 1}
   colorStrength: 0.4
   state: 0
   material: {fileID: 2100000, guid: 05d5c30d0c4f745efa08c9fa2784de62, type: 2}
-  qualityLossModel: {fileID: 0}
+  qualityLossModel: {fileID: 11400000, guid: ba410e0f9f9bff046905fb1c081ebf2f, type: 2}
