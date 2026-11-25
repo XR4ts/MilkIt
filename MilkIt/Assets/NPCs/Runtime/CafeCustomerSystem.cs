@@ -63,8 +63,20 @@ namespace MilkIt.NPCs
         [Min(0)] public int defaultPrice = 3;
         [Tooltip("Optional marker above each customer's head (patience bar, payment popup).")]
         public CustomerPatienceIndicator patienceIndicatorPrefab;
+
+        [Header("Ordering at the till")]
+        [Tooltip("Customers wait at the register until the player selects them (ray, poke or click).")]
+        public bool requireOrderClick;
+        [Tooltip("Debug: take orders automatically instead of waiting for the player.")]
+        public bool autoTakeOrders;
+        [Tooltip("Drink pictures (from the coffee poster), in the same order as Drinks.")]
+        public Texture2D[] drinkIcons = new Texture2D[0];
+        [Tooltip("Optional speech bubble that shows the order above the customer.")]
+        public CustomerOrderBubble orderBubblePrefab;
         public bool autoServe;
         public bool showDebugPanel = true;
+        [Tooltip("Off: the panel only shows Serve buttons for customers waiting for their drink.")]
+        public bool fullDebugPanel = true;
 
         // The order ID identifies one visit, even when multiple customers want the same drink.
         public event Action<int, string> OrderPlaced;
@@ -73,6 +85,10 @@ namespace MilkIt.NPCs
         public event Action<int, int> CustomerPaid;
         // orderId. Raised when a customer's patience runs out; they leave without paying.
         public event Action<int> CustomerGaveUp;
+        // (customer, object) Raised when a physical object (anything with a Rigidbody, e.g. a cup) is brought to a
+        // seated customer who is waiting for their drink: into their hand-off zone over them and their half of the
+        // table. Once per object per visit to the zone. Grade it and call TryDeliverDrink to serve.
+        public event Action<CustomerController, GameObject> DrinkHandedOver;
         public int CompletedVisits { get; private set; }
         public int Earnings { get; private set; }
         public int GaveUpCount { get; private set; }
@@ -130,11 +146,13 @@ namespace MilkIt.NPCs
                     if (prefab != null) customer.AttachCharacter(prefab, characterWalkSpeed);
                 }
                 customer.AttachIndicator(patienceIndicatorPrefab);
+                customer.AttachOrderBubble(orderBubblePrefab);
+                if (requireOrderClick) customer.MakeSelectable();
                 customers.Add(customer);
                 queue.Add(customer);
                 party?.Members.Add(customer);
                 int id = nextOrderId++;
-                customer.Begin(this, reserved[i], id, drinks[(id - 1) % drinks.Length], party, startAt - Time.time);
+                customer.Begin(this, reserved[i], id, drinks[UnityEngine.Random.Range(0, drinks.Length)], party, startAt - Time.time);
             }
             feedback = size == 1 ? $"Customer {firstId} arrived."
                 : $"Party {party.Id} arrived: customers {firstId}–{nextOrderId - 1}.";
@@ -200,6 +218,20 @@ namespace MilkIt.NPCs
             OrderPlaced?.Invoke(customer.OrderId, customer.Drink);
         }
 
+        public Texture2D IconOf(string drink)
+        {
+            var index = drinks != null ? Array.IndexOf(drinks, drink) : -1;
+            return index >= 0 && drinkIcons != null && index < drinkIcons.Length ? drinkIcons[index] : null;
+        }
+
+        // Called when the player selects a customer. Only the customer waiting at the till can order.
+        public bool TakeOrder(CustomerController customer)
+        {
+            if (customer == null || !customer.TryTakeOrder()) return false;
+            feedback = $"Taking order from customer {customer.OrderId}.";
+            return true;
+        }
+
         public int PriceOf(string drink)
         {
             var index = drinks != null ? Array.IndexOf(drinks, drink) : -1;
@@ -213,6 +245,12 @@ namespace MilkIt.NPCs
             feedback = $"Customer {customer.OrderId} paid {amount} for {customer.Drink}.";
             CustomerPaid?.Invoke(customer.OrderId, amount);
             return amount;
+        }
+
+        internal void ReportHandOver(CustomerController customer, GameObject item)
+        {
+            feedback = $"{item.name} handed to customer {customer.OrderId} ({customer.Drink}).";
+            DrinkHandedOver?.Invoke(customer, item);
         }
 
         internal void GiveUp(CustomerController customer)
@@ -243,18 +281,40 @@ namespace MilkIt.NPCs
 
         void Update()
         {
-            if (!autoServe) return;
+            if (!autoServe && !autoTakeOrders) return;
             foreach (var customer in customers)
-                if (customer != null && customer.State == CustomerState.WaitingForDrink)
+            {
+                if (customer == null) continue;
+                if (autoServe && customer.State == CustomerState.WaitingForDrink)
                     TryDeliverDrink(customer.OrderId, customer.Drink);
+                if (autoTakeOrders && customer.State == CustomerState.WaitingAtTill)
+                    TakeOrder(customer);
+            }
+        }
+
+        // Minimal panel until drink making is in the scene: one button per customer waiting for their drink.
+        void ServePanel()
+        {
+            var waiting = customers.FindAll(c => c != null && c.State == CustomerState.WaitingForDrink);
+            if (waiting.Count == 0) return;
+            GUILayout.BeginArea(new Rect(12, 12, 260, 34 + waiting.Count * 26), GUI.skin.box);
+            GUILayout.Label("Serve drinks (debug)");
+            foreach (var customer in waiting)
+                if (GUILayout.Button($"Serve {customer.Drink} to #{customer.OrderId}"))
+                    TryDeliverDrink(customer.OrderId, customer.Drink);
+            GUILayout.EndArea();
         }
 
         void OnGUI()
         {
             if (!showDebugPanel) return;
+            if (!fullDebugPanel) { ServePanel(); return; }
             GUILayout.BeginArea(new Rect(12, 12, 330, Mathf.Max(200, Screen.height - 24)), GUI.skin.box);
             GUILayout.Label("MILKIT / CUSTOMER PROTOTYPE");
             GUILayout.Label("Enter → Queue → Order → Sit → Drink → Leave");
+            var service = GetComponent<CafeService>();
+            if (service != null && GUILayout.Button(service.IsOpen ? "Close café (sign)" : "Open café (sign)"))
+                service.Toggle();
             if (tables != null && tables.Length > 0 && maxPartySize > 1)
             {
                 GUILayout.BeginHorizontal();
@@ -268,6 +328,7 @@ namespace MilkIt.NPCs
             }
             else if (GUILayout.Button("Spawn customer")) TrySpawnCustomer();
             autoServe = GUILayout.Toggle(autoServe, "Automatically serve waiting customers");
+            if (requireOrderClick) autoTakeOrders = GUILayout.Toggle(autoTakeOrders, "Automatically take orders at the till");
             var free = 0;
             if (seats != null) foreach (var s in seats) if (s != null && s.Occupant == null) free++;
             GUILayout.Label($"Active: {customers.Count}    Completed: {CompletedVisits}    Free seats: {free}");
@@ -281,21 +342,14 @@ namespace MilkIt.NPCs
                 var wait = customer.State == CustomerState.WaitingForDrink && patienceSeconds > 0f
                     ? $" · {Mathf.CeilToInt(customer.PatienceSecondsLeft)} s{(customer.Frustrated ? " !" : "")}" : "";
                 GUILayout.Label($"#{customer.OrderId} · {customer.Drink} ({PriceOf(customer.Drink)}) · {customer.State}{wait}{group}");
+                if (customer.State == CustomerState.WaitingAtTill &&
+                    GUILayout.Button($"Take order from #{customer.OrderId}"))
+                    TakeOrder(customer);
                 if (customer.State == CustomerState.WaitingForDrink &&
                     GUILayout.Button($"Serve {customer.Drink} to #{customer.OrderId}"))
                     TryDeliverDrink(customer.OrderId, customer.Drink);
             }
             GUILayout.EndArea();
-            var view = Camera.main;
-            if (view == null) return;
-            foreach (var customer in customers)
-            {
-                if (customer == null) continue;
-                var point = view.WorldToScreenPoint(customer.LabelPosition);
-                if (point.z > 0)
-                    GUI.Box(new Rect(point.x - 70, Screen.height - point.y - 12, 140, 24),
-                        $"#{customer.OrderId} · {customer.State}");
-            }
         }
     }
 }

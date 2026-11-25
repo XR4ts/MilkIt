@@ -45,6 +45,11 @@ public class WristMenuController : MonoBehaviour
     [SerializeField] Button backFromSettingsButton;
     [SerializeField] Button quitButton;
 
+    [Header("Audio")]
+    [SerializeField] GameObject audioPanel;
+    [SerializeField] Button audioButton;
+    [SerializeField] Button backFromAudioButton;
+
     [Header("Placement")]
     [Tooltip("World-space offset from the left controller, in meters.")]
     [SerializeField] Vector3 offsetFromHand = new Vector3(0f, 0.12f, 0f);
@@ -104,6 +109,8 @@ public class WristMenuController : MonoBehaviour
         if (smoothTurnToggle) smoothTurnToggle.onValueChanged.AddListener(SetSmoothTurn);
         if (puddleSlider) puddleSlider.onValueChanged.AddListener(OnPuddleSliderChanged);
         if (quitButton) quitButton.onClick.AddListener(QuitGame);
+        if (audioButton) audioButton.onClick.AddListener(OpenAudio);
+        if (backFromAudioButton) backFromAudioButton.onClick.AddListener(CloseAudio);
     }
 
     void OnDisable()
@@ -119,6 +126,8 @@ public class WristMenuController : MonoBehaviour
         if (smoothTurnToggle) smoothTurnToggle.onValueChanged.RemoveListener(SetSmoothTurn);
         if (puddleSlider) puddleSlider.onValueChanged.RemoveListener(OnPuddleSliderChanged);
         if (quitButton) quitButton.onClick.RemoveListener(QuitGame);
+        if (audioButton) audioButton.onClick.RemoveListener(OpenAudio);
+        if (backFromAudioButton) backFromAudioButton.onClick.RemoveListener(CloseAudio);
     }
 
     void OnDestroy() => toggleAction.Dispose();
@@ -143,9 +152,10 @@ public class WristMenuController : MonoBehaviour
             wristMenuCanvas.SetActive(open);
 
         // reset panels when closing
-        if (!open && settingsPanel)
+        if (!open)
         {
-            settingsPanel.SetActive(false);
+            if (settingsPanel) settingsPanel.SetActive(false);
+            if (audioPanel) audioPanel.SetActive(false);
             if (mainButtonsPanel) mainButtonsPanel.SetActive(true);
         }
     }
@@ -163,7 +173,8 @@ public class WristMenuController : MonoBehaviour
 
     public void ResetObjects()
     {
-        // TODO: object reset logic
+        // TODO: object reset logic instead whole scene
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -176,6 +187,18 @@ public class WristMenuController : MonoBehaviour
     public void CloseSettings()
     {
         if (settingsPanel) settingsPanel.SetActive(false);
+        if (mainButtonsPanel) mainButtonsPanel.SetActive(true);
+    }
+
+    public void OpenAudio()
+    {
+        if (mainButtonsPanel) mainButtonsPanel.SetActive(false);
+        if (audioPanel) audioPanel.SetActive(true);
+    }
+
+    public void CloseAudio()
+    {
+        if (audioPanel) audioPanel.SetActive(false);
         if (mainButtonsPanel) mainButtonsPanel.SetActive(true);
     }
 
