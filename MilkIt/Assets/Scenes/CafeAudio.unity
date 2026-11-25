@@ -6926,7 +6926,7 @@ MonoBehaviour:
   rightSpeaker: {fileID: 1269269730}
   leftChannel: {fileID: 8300000, guid: 493f1f41779f17944b79b0fb6d57e359, type: 3}
   rightChannel: {fileID: 8300000, guid: ae40c80f00722194db83a76ae455cb69, type: 3}
-  volume: 0.35
+  volume: 0.08
   onlyWhenOpen: 0
   fadeSeconds: 2
 --- !u!1001 &1142274717
@@ -8210,7 +8210,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3441762775603002508, guid: 806b3b40b5d28a343a63aa97ae7883f8, type: 3}
       propertyPath: m_Volume
-      value: 0.7
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 5844625887297519336, guid: 806b3b40b5d28a343a63aa97ae7883f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -13611,7 +13611,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3441762775603002508, guid: 806b3b40b5d28a343a63aa97ae7883f8, type: 3}
       propertyPath: m_Volume
-      value: 0.7
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 5844625887297519336, guid: 806b3b40b5d28a343a63aa97ae7883f8, type: 3}
       propertyPath: m_LocalPosition.x
