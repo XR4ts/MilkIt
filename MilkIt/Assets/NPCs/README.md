@@ -1,6 +1,28 @@
 # Customer prototype
 
-## Real café integration
+## Main café (Cafe.unity)
+
+**MilkIt > NPCs > Add customers to main cafe (Cafe.unity)** adds the whole customer setup to the real café scene and keeps its VR rig. It is safe to run again: it replaces its own "NPC Integration" object and rebakes `Cafe_Main_NavMesh.asset` (floor, sidewalk, walls, booths, counter).
+
+- **OPEN / CLOSED sign** on the inside of the left entrance door. Select it (controller ray, poke, or left-click in the editor) to flip it. Like a real shop sign, the street side shows the state (OPEN faces outside while open; inside you see the other side). While CLOSED the café stays empty, so you can practise making coffee. While OPEN, `CafeService` sends parties of 1–4 up the sidewalk every 10–20 s (`arrivalInterval`) until `maxCustomers` are inside. Closing stops new arrivals; customers already inside finish and pay.
+- **Ordering at the till:** the first customer in the queue waits at the register with a "?" bubble until you select them. Then the bubble shows their drink's picture from the coffee poster and they go to a table. Once seated, the picture moves next to their patience bar (replacing the old cup icon) until they are served.
+- **Drinks:** the eight drinks on the coffee poster (`Assets/Textures/Posters/CoffeeProportions.png`); each picture is cut from the poster into `NPCs/Orders/Icons/`. Prices 3–5.
+- **Debug panel (desktop/simulator only):** only "Serve [drink] to #n" buttons, until drink making is in this scene. Tick **Full Debug Panel** on the Customer System for spawning, order and auto-serve controls.
+
+### Handing a drink to a customer (for the drink-making code)
+
+While a customer sits waiting for their drink, an invisible **hand-off zone** covers them and their half of the table (it stops at the table's middle, so customers facing each other don't share one). When a physical object (anything with a Rigidbody, e.g. a grabbable cup) is brought into it, the café raises `DrinkHandedOver` once per object; take it out and back in to offer it again. Grading is entirely up to the drink-making code; to serve, call `TryDeliverDrink`:
+
+```csharp
+cafe.DrinkHandedOver += (customer, cup) =>
+{
+    // customer.OrderId and customer.Drink (a poster name, e.g. "Cortado") say what they ordered.
+    if (MyDrinkGrader.IsGoodEnough(cup, customer.Drink))
+        cafe.TryDeliverDrink(customer.OrderId, customer.Drink); // they drink, pay and leave
+};
+```
+
+## Test café (Cafe_NPC.unity)
 
 Open **MilkIt > NPCs > Open cafe with customers**, or **Assets/NPCs/Scenes/Cafe_NPC.unity**, then press Play. Pick a **Party size** (1–4) and click **Spawn**. Customers start on the outside walkway, pass through automatic sliding doors, queue at the real till, order, and sit at one of the seven booths.
 
@@ -10,6 +32,9 @@ Open **MilkIt > NPCs > Open cafe with customers**, or **Assets/NPCs/Scenes/Cafe_
 - **Parties:** a party queues together, each member orders their own drink (one order ID each), the party sits at one table, chats while seated (SitTalk) and leaves together once everyone has finished. Wall-side seats go to the first arrivals so nobody slides past a seated friend.
 - **Seat choice:** an empty table first; otherwise, with **Share tables** on, free seats at a partly used table.
 - **Flow:** after ordering, customers leave the till westward along the counter, so they never meet the queue head-on in the narrow gap between the condiment bar and the queue rail.
+- **Patience:** once seated, each customer waits `patienceSeconds` (default 60, 0 = unlimited) for their drink. A marker above their head shows a cup icon and a bar that turns from green to red, with the seconds left; in the last `frustratedAt` (35%) the countdown turns red with a "!" (e.g. "! 4") and pulses, and they stop chatting. When it runs out they stand up and leave without paying (red "×"); friends at the table carry on.
+- **Payment:** customers pay only after finishing their drink (green "+price" popup). Prices are in `drinkPrices`, in the same order as `drinks` (`defaultPrice` otherwise). Patience and prices are plain fields so a level system can set them.
+- **Arrivals:** customers set off from the entrance about 0.9 s apart, even if several parties spawn in the same frame.
 
 This scene is a copy of Cafe.unity. It has an overhead observation camera, the ceiling hidden, and the original XR rig inactive so you can inspect the entire route. The original Cafe.unity is untouched. Drink delivery still uses the debug buttons.
 
@@ -56,9 +81,13 @@ Select **Customer System** to inspect the entrance, exit, ordered queue markers,
 - `CafeCustomerSystem.OrderPlaced(int orderId, string drink)` fires once at the counter. An order ID identifies a visit, not just a recipe.
 - Call `TryDeliverDrink(orderId, drink)` after delivery to the matching customer's table. It returns false for an unknown order, wrong drink, duplicate delivery, or a customer who is not yet seated and waiting.
 - `CustomerLeft(int orderId)` reports a completed visit. `CompletedVisits` counts those visits.
+- `CafeService.Open()`, `Close()`, `Toggle()` and `OpenChanged(bool)` control opening hours (the sign and a menu can both use them).
+- `TakeOrder(customer)` takes the order of the customer waiting at the till; `OrderPlaced` still fires when the order is placed.
 - `TrySpawnParty(int size)` spawns 1–4 customers who share a table; `TrySpawnCustomer()` is a party of one.
+- `CustomerPaid(int orderId, int amount)` fires when a customer finishes their drink and pays; `Earnings` is the running total.
+- `CustomerGaveUp(int orderId)` fires when patience runs out; `GaveUpCount` counts them. `CustomerLeft` / `CompletedVisits` still mean paid visits only, and `TryDeliverDrink` returns false once a customer has given up.
 - The current string drink IDs are placeholders. Agree on shared recipe IDs with the teammate implementing drink preparation before integrating.
-- Unreachable routes or movement blocked for 45 seconds warn in the Console, remove the affected customer, and release its queue position/seat. Waiting at a queue marker or waiting for a drink has no patience timeout yet. Party members wait for each other before leaving.
+- Unreachable routes or movement blocked for 45 seconds warn in the Console, remove the affected customer, and release its queue position/seat. Waiting in the queue has no patience timeout; waiting for a drink does (see above). Party members wait for each other before leaving.
 
 Keep approaches beside chairs, outside furniture collision volumes. The real café integration above uses its own baked NavMesh instead of `PrototypeNavigation`. The customer logic deliberately does not depend on the VR player or coffee machine.
 
