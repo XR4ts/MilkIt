@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using MilkIt.Machine.DrinkGrader;
+using MilkIt.Fluids;
+using System.Linq;
 
 namespace MilkIt.NPCs
 {
@@ -48,7 +51,7 @@ namespace MilkIt.NPCs
         [Tooltip("Optional character visuals (generated Humanoid prefabs). Empty keeps the capsules.")]
         public GameObject[] characterPrefabs = new GameObject[0];
         [Min(0.3f)] public float characterWalkSpeed = 1.2f;
-        public string[] drinks = { "Espresso", "Latte", "Cappuccino" };
+        public string[] drinks;
         [Min(0.1f)] public float orderSeconds = 2f;
         [Min(0.1f)] public float drinkingSeconds = 8f;
         [Range(1, 4)] public int maxPartySize = 4;
@@ -59,7 +62,7 @@ namespace MilkIt.NPCs
         [Tooltip("Fraction of patience left when the customer starts looking frustrated.")]
         [Range(0f, 1f)] public float frustratedAt = 0.35f;
         [Tooltip("Price per drink, in the same order as Drinks. Missing entries use Default Price.")]
-        public int[] drinkPrices = { 3, 4, 4 };
+        public int[] drinkPrices;
         [Min(0)] public int defaultPrice = 3;
         [Tooltip("Optional marker above each customer's head (patience bar, payment popup).")]
         public CustomerPatienceIndicator patienceIndicatorPrefab;
@@ -101,6 +104,21 @@ namespace MilkIt.NPCs
         float entranceFreeAt;
         const float ArrivalSpacing = 0.9f;
         string feedback = "Spawn a customer to begin.";
+
+        void Start()
+        {
+            DrinkType[] drinkTypes = Resources.LoadAll<DrinkType>("DrinkTypes");
+            drinks = drinkTypes.Select(d => d.name).ToArray();
+            drinkPrices = drinkTypes.Select(d => d.price).ToArray();
+            DrinkHandedOver += (customerController, gameObject) =>
+            {
+                if (!gameObject.TryGetComponent<FluidContainer>(out FluidContainer fluidContainer))
+                    return;
+                (float drinkScore, DrinkType predictedDrink) = DrinkGrader.GradeDrink(fluidContainer);
+                string drinkName = predictedDrink.name; // Why are we operating on magic fucking strings for names of drinks................... Love you Claude
+                TryDeliverDrink(customerController.OrderId, drinkName, Mathf.RoundToInt(drinkScore * PriceOf(drinkName)));
+            };
+        }
 
         public bool TrySpawnCustomer() => TrySpawnParty(1);
 
@@ -238,9 +256,8 @@ namespace MilkIt.NPCs
             return index >= 0 && drinkPrices != null && index < drinkPrices.Length ? drinkPrices[index] : defaultPrice;
         }
 
-        internal int Pay(CustomerController customer)
+        internal int Pay(CustomerController customer, int amount)
         {
-            var amount = PriceOf(customer.Drink);
             Earnings += amount;
             feedback = $"Customer {customer.OrderId} paid {amount} for {customer.Drink}.";
             CustomerPaid?.Invoke(customer.OrderId, amount);
@@ -262,10 +279,16 @@ namespace MilkIt.NPCs
 
         // Call this from the team's serving system once a drink is delivered to this customer.
         // False means an unknown order, wrong drink, or customer not ready to receive it.
+        public bool TryDeliverDrink(int orderId, string drink, int drinkPrice)
+        {
+            var customer = customers.Find(c => c != null && c.OrderId == orderId);
+            return customer != null && customer.TryReceiveDrink(drink, drinkPrice);
+        }
+
         public bool TryDeliverDrink(int orderId, string drink)
         {
             var customer = customers.Find(c => c != null && c.OrderId == orderId);
-            return customer != null && customer.TryReceiveDrink(drink);
+            return customer != null && customer.TryReceiveDrink(drink, PriceOf(drink));
         }
 
         internal void Remove(CustomerController customer, bool completed)
@@ -286,7 +309,7 @@ namespace MilkIt.NPCs
             {
                 if (customer == null) continue;
                 if (autoServe && customer.State == CustomerState.WaitingForDrink)
-                    TryDeliverDrink(customer.OrderId, customer.Drink);
+                    TryDeliverDrink(customer.OrderId, customer.Drink, PriceOf(customer.Drink));
                 if (autoTakeOrders && customer.State == CustomerState.WaitingAtTill)
                     TakeOrder(customer);
             }

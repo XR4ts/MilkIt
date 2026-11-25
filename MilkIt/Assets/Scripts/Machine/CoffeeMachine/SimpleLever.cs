@@ -9,7 +9,6 @@ namespace MilkIt.Machine.CoffeeMachine{
         [SerializeField] private FluidSource alternativeFluidSource;
 
         private float total;
-        // TODO: GroundCoffee now works, but it is consumed, should it be transformed to used coffee grounds?
         void Start()
         {
             total = hinge.limits.max - hinge.limits.min;

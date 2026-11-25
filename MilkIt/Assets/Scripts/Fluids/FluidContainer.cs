@@ -60,6 +60,11 @@ namespace MilkIt.Fluids
         protected Vector3 fillGravity;
         protected bool fillDirty = true;
 
+        // Lightweight steam/smoke cue for hot contents.
+        protected ParticleSystem hotSmoke;
+        protected Material hotSmokeMaterial;
+        protected bool wasHot;
+
         public Transform Opening => opening != null ? opening : transform;
         public IReadOnlyList<FluidLayer> Layers => layers;
         public float Total => total;
@@ -71,6 +76,8 @@ namespace MilkIt.Fluids
 
         public float SurfaceWorldY => Opening.position.y - WorldDepth * (isDrain ? 1f : 1f - FillFraction);
         protected MeshCollider fillCollider;
+        // for quality control
+        public bool isRefrigerated = false;
 
         void Awake()
         {
@@ -84,6 +91,8 @@ namespace MilkIt.Fluids
         void OnDestroy()
         {
             if (fillMesh != null) Destroy(fillMesh.Mesh);
+            if (hotSmoke != null) Destroy(hotSmoke.gameObject);
+            if (hotSmokeMaterial != null) Destroy(hotSmokeMaterial);
         }
 
         public float GetAmount(FluidType type)
@@ -195,6 +204,11 @@ namespace MilkIt.Fluids
         {
             if (total <= 0f) return;
 
+            foreach (FluidLayer layer in layers)
+            {
+                layer.TickQuality(this, Time.deltaTime);
+            }
+
             Vector3 gravity = Opening.InverseTransformDirection(Vector3.down);
             if ((gravity - fillGravity).sqrMagnitude > 1e-6f) fillDirty = true;
 
@@ -211,9 +225,13 @@ namespace MilkIt.Fluids
 
         void LateUpdate()
         {
-            if (!fillDirty) return;
-            fillDirty = false;
-            UpdateFillVisual();
+            if (fillDirty)
+            {
+                fillDirty = false;
+                UpdateFillVisual();
+            }
+
+            UpdateHotSmoke();
         }
 
         float MaxFillAtTilt(float cosTilt)
@@ -246,6 +264,149 @@ namespace MilkIt.Fluids
         {
             if (stream == null) stream = FluidStream.Create(gameObject, this);
             return stream;
+        }
+
+        bool ContainsHotFluid()
+        {
+            for (int i = 0; i < layers.Count; i++)
+            {
+                if (layers[i].isHot && layers[i].amount > 0.001f)
+                    return true;
+            }
+
+            return false;
+        }
+
+        void UpdateHotSmoke()
+        {
+            bool hot = showFill && !isDrain && total > 0f && ContainsHotFluid();
+
+            if (!hot)
+            {
+                if (hotSmoke != null && wasHot)
+                    hotSmoke.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+                wasHot = false;
+                return;
+            }
+
+            if (hotSmoke == null)
+            {
+                var smokeObject = new GameObject("Hot Fluid Steam");
+                // Keep the emitter aligned to world up even if the container tilts.
+                // This prevents particles being emitted sideways or down into the liquid.
+                smokeObject.transform.SetParent(null);
+                smokeObject.transform.rotation = Quaternion.identity;
+                hotSmoke = smokeObject.AddComponent<ParticleSystem>();
+
+                var main = hotSmoke.main;
+                main.loop = true;
+                main.playOnAwake = false;
+                main.simulationSpace = ParticleSystemSimulationSpace.World;
+                main.startLifetime = new ParticleSystem.MinMaxCurve(1.5f, 2.4f);
+                // Keep intrinsic speed near zero; upward movement is controlled below.
+                main.startSpeed = 0f;
+                // Do not let built-in particle gravity pull steam back into the cup.
+                main.gravityModifier = 0f;
+                main.startSize = new ParticleSystem.MinMaxCurve(0.003f, 0.008f);
+                main.startColor = new ParticleSystem.MinMaxGradient(
+                    new Color(0.78f, 0.82f, 0.86f, 0.28f),
+                    new Color(0.95f, 0.96f, 0.98f, 0.48f));
+                main.maxParticles = 40;
+
+                var emission = hotSmoke.emission;
+                emission.rateOverTime = 7f;
+
+                // Slow, consistent world-up movement. No random horizontal velocity,
+                // so wisps do not spin off in arbitrary directions.
+                var velocity = hotSmoke.velocityOverLifetime;
+                velocity.enabled = true;
+                velocity.space = ParticleSystemSimulationSpace.World;
+                // Keep all three curves in Constant mode; mixing Constant and
+                // Two Constants causes Unity's "curves must all be in the same mode" error.
+                velocity.x = new ParticleSystem.MinMaxCurve(0f);
+                velocity.y = new ParticleSystem.MinMaxCurve(0.012f);
+                velocity.z = new ParticleSystem.MinMaxCurve(0f);
+
+                // Disable noise: it can add downward velocity and make wisps dip back
+                // through the opening. With zero start speed/gravity and positive world-Y
+                // velocity above, particles only travel upward.
+                var noise = hotSmoke.noise;
+                noise.enabled = false;
+
+                var shape = hotSmoke.shape;
+                shape.enabled = true;
+                shape.shapeType = ParticleSystemShapeType.Circle;
+                shape.radius = Mathf.Max(0.001f, WorldRadius * 0.95f);
+                // Emit throughout the circle area, not just near its center/edge.
+                shape.radiusThickness = 1f;
+                // The emitter itself is world-aligned, so this circle stays horizontal.
+                shape.rotation = Vector3.zero;
+
+                var colorOverLifetime = hotSmoke.colorOverLifetime;
+                colorOverLifetime.enabled = true;
+                var gradient = new Gradient();
+                gradient.SetKeys(
+                    new[]
+                    {
+                        new GradientColorKey(new Color(0.82f, 0.86f, 0.9f), 0f),
+                        new GradientColorKey(new Color(0.9f, 0.92f, 0.95f), 1f)
+                    },
+                    new[]
+                    {
+                        new GradientAlphaKey(0f, 0f),
+                        new GradientAlphaKey(0.32f, 0.15f),
+                        new GradientAlphaKey(0f, 1f)
+                    });
+                colorOverLifetime.color = gradient;
+
+                var renderer = smokeObject.GetComponent<ParticleSystemRenderer>();
+                renderer.renderMode = ParticleSystemRenderMode.Billboard;
+                renderer.sortingFudge = 1f;
+
+                // Particle systems need a compatible transparent particle shader.
+                // Without an assigned material Unity may render them magenta.
+                Shader particleShader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+                if (particleShader == null)
+                    particleShader = Shader.Find("Particles/Standard Unlit");
+                if (particleShader == null)
+                    particleShader = Shader.Find("Legacy Shaders/Particles/Alpha Blended");
+
+                if (particleShader != null)
+                {
+                    hotSmokeMaterial = new Material(particleShader)
+                    {
+                        name = "Hot Fluid Steam (Runtime)",
+                        hideFlags = HideFlags.HideAndDontSave
+                    };
+                    renderer.sharedMaterial = hotSmokeMaterial;
+                }
+                else
+                {
+                    Debug.LogWarning(
+                        "No compatible particle shader found for hot fluid steam. " +
+                        "Assign a transparent particle material compatible with your render pipeline.",
+                        this);
+                }
+            }
+
+            // Keep the entire emission plane above the rim, not at the liquid surface.
+            // Otherwise particles can begin inside the cup when it is partly filled or tilted.
+            Transform o = Opening;
+            Vector3 rimX = o.right * (openingRadius * o.lossyScale.x);
+            Vector3 rimZ = o.forward * (openingRadius * o.lossyScale.z);
+            float rimVerticalExtent = Mathf.Sqrt(rimX.y * rimX.y + rimZ.y * rimZ.y);
+            float clearance = Mathf.Max(0.003f, WorldRadius * 0.12f);
+            hotSmoke.transform.position = o.position + Vector3.up * (rimVerticalExtent + clearance);
+            hotSmoke.transform.rotation = Quaternion.identity;
+
+            var smokeShape = hotSmoke.shape;
+            smokeShape.radius = Mathf.Max(0.001f, WorldRadius * 0.95f);
+            smokeShape.radiusThickness = 1f;
+
+            if (!hotSmoke.isPlaying)
+                hotSmoke.Play();
+
+            wasHot = true;
         }
 
         protected virtual void UpdateFillVisual()

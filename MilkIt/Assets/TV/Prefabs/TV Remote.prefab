@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1044186985002489886}
   - component: {fileID: 2399738442815533145}
   - component: {fileID: 6797080757696913171}
-  - component: {fileID: 360716598456312212}
+  - component: {fileID: 3278342944694349432}
   m_Layer: 0
   m_Name: Next Button
   m_TagString: Untagged
@@ -113,7 +113,7 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &360716598456312212
+--- !u!114 &3278342944694349432
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -122,9 +122,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 340722182450200614}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a35f6cfbfba9b548aaa00d52cfe8a50, type: 3}
+  m_Script: {fileID: 11500000, guid: 2ba7a839fafc0aa0e870e01d419fa115, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.Interactables.XRSimpleInteractable
+  m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Interaction.TriggerButton
   m_InteractionManager: {fileID: 0}
   m_Colliders: []
   m_InteractionLayers:
@@ -160,19 +160,7 @@ MonoBehaviour:
       m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1849216176333316941}
-        m_TargetAssemblyTypeName: MilkIt.TV.TvRemote, Assembly-CSharp
-        m_MethodName: Next
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_SelectExited:
     m_PersistentCalls:
       m_Calls: []
@@ -199,6 +187,23 @@ MonoBehaviour:
   m_StartingInteractionStrengthFilters: []
   m_AutoFindParentInteractableInHierarchy: 0
   m_ParentInteractableObject: {fileID: 0}
+  onPressed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1849216176333316941}
+        m_TargetAssemblyTypeName: MilkIt.TV.TvRemote, Assembly-CSharp
+        m_MethodName: Next
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  highlightRenderer: {fileID: 0}
+  highlightAmount: 0.5
 --- !u!1 &1844481771425789851
 GameObject:
   m_ObjectHideFlags: 0
@@ -211,7 +216,7 @@ GameObject:
   - component: {fileID: 4546379030915476338}
   - component: {fileID: 7320097008412503246}
   - component: {fileID: 1412370838917811505}
-  - component: {fileID: 6104776613797557881}
+  - component: {fileID: 363041349889948454}
   m_Layer: 0
   m_Name: Power Button
   m_TagString: Untagged
@@ -312,7 +317,7 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &6104776613797557881
+--- !u!114 &363041349889948454
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -321,9 +326,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1844481771425789851}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a35f6cfbfba9b548aaa00d52cfe8a50, type: 3}
+  m_Script: {fileID: 11500000, guid: 2ba7a839fafc0aa0e870e01d419fa115, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.Interactables.XRSimpleInteractable
+  m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Interaction.TriggerButton
   m_InteractionManager: {fileID: 0}
   m_Colliders: []
   m_InteractionLayers:
@@ -359,19 +364,7 @@ MonoBehaviour:
       m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1849216176333316941}
-        m_TargetAssemblyTypeName: MilkIt.TV.TvRemote, Assembly-CSharp
-        m_MethodName: Power
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_SelectExited:
     m_PersistentCalls:
       m_Calls: []
@@ -398,6 +391,23 @@ MonoBehaviour:
   m_StartingInteractionStrengthFilters: []
   m_AutoFindParentInteractableInHierarchy: 0
   m_ParentInteractableObject: {fileID: 0}
+  onPressed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1849216176333316941}
+        m_TargetAssemblyTypeName: MilkIt.TV.TvRemote, Assembly-CSharp
+        m_MethodName: Power
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  highlightRenderer: {fileID: 0}
+  highlightAmount: 0.5
 --- !u!1 &3863779954190873730
 GameObject:
   m_ObjectHideFlags: 0
@@ -410,7 +420,7 @@ GameObject:
   - component: {fileID: 3484763454237198603}
   - component: {fileID: 720513724064449583}
   - component: {fileID: 8126216595556420594}
-  - component: {fileID: 2104611832087919738}
+  - component: {fileID: 2731938033184156282}
   m_Layer: 0
   m_Name: Mute Button
   m_TagString: Untagged
@@ -511,7 +521,7 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &2104611832087919738
+--- !u!114 &2731938033184156282
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -520,9 +530,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 3863779954190873730}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a35f6cfbfba9b548aaa00d52cfe8a50, type: 3}
+  m_Script: {fileID: 11500000, guid: 2ba7a839fafc0aa0e870e01d419fa115, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.Interactables.XRSimpleInteractable
+  m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Interaction.TriggerButton
   m_InteractionManager: {fileID: 0}
   m_Colliders: []
   m_InteractionLayers:
@@ -558,19 +568,7 @@ MonoBehaviour:
       m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1849216176333316941}
-        m_TargetAssemblyTypeName: MilkIt.TV.TvRemote, Assembly-CSharp
-        m_MethodName: Mute
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_SelectExited:
     m_PersistentCalls:
       m_Calls: []
@@ -597,6 +595,23 @@ MonoBehaviour:
   m_StartingInteractionStrengthFilters: []
   m_AutoFindParentInteractableInHierarchy: 0
   m_ParentInteractableObject: {fileID: 0}
+  onPressed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1849216176333316941}
+        m_TargetAssemblyTypeName: MilkIt.TV.TvRemote, Assembly-CSharp
+        m_MethodName: Mute
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  highlightRenderer: {fileID: 0}
+  highlightAmount: 0.5
 --- !u!1 &5683403615340328248
 GameObject:
   m_ObjectHideFlags: 0
