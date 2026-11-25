@@ -9,8 +9,10 @@ namespace MilkIt.Fluids
         public FluidType fluidType;
         [Tooltip("ml per second at full flow.")]
         public float flowRate = 60f;
-        [Tooltip("Where the stream starts. Defaults to this transform.")]
+        
+        [Tooltip("Spout to produce liquid from, default to this Transform.")]
         public Transform spout;
+        protected virtual Transform Spout => spout;
         public bool startOn;
 
         [Header("Dose")]
@@ -32,8 +34,8 @@ namespace MilkIt.Fluids
         public UnityEvent onSupplyEmpty = new UnityEvent();
 
         FluidStream stream;
-        float remaining;
-        float flowScale = 1f;
+        protected float remaining;
+        protected float flowScale = 1f;
 
         public bool IsFlowing { get; private set; }
 
@@ -72,7 +74,7 @@ namespace MilkIt.Fluids
             onStarted.Invoke();
         }
 
-        void Update()
+        protected virtual void Update()
         {
             if (!IsFlowing || fluidType == null) return;
 
