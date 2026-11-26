@@ -346,6 +346,8 @@ MonoBehaviour:
   layers:
   - type: {fileID: 11400000, guid: 4890d850b88a59a57a596109a214ae25, type: 2}
     amount: 1
+    quality: 1
+    isHot: 0
   opening: {fileID: 0}
   openingRadius: 0.035
   depth: 0.065
@@ -371,6 +373,7 @@ MonoBehaviour:
   onDrained:
     m_PersistentCalls:
       m_Calls: []
+  isRefrigerated: 0
 --- !u!1 &6886527206429155261
 GameObject:
   m_ObjectHideFlags: 0

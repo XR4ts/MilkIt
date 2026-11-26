@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using MilkIt.Machine.DrinkGrader;
+using MilkIt.Machine;
 using MilkIt.Fluids;
 using System.Linq;
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace MilkIt.NPCs
 {
@@ -32,6 +36,7 @@ namespace MilkIt.NPCs
 
     public sealed class CafeCustomerSystem : MonoBehaviour
     {
+        public TextMesh scoreFace;
         public Transform entrance;
         public Transform exit;
         [Tooltip("Optional point just inside the entrance, before joining the counter queue.")]
@@ -51,7 +56,6 @@ namespace MilkIt.NPCs
         [Tooltip("Optional character visuals (generated Humanoid prefabs). Empty keeps the capsules.")]
         public GameObject[] characterPrefabs = new GameObject[0];
         [Min(0.3f)] public float characterWalkSpeed = 1.2f;
-        public string[] drinks;
         [Min(0.1f)] public float orderSeconds = 2f;
         [Min(0.1f)] public float drinkingSeconds = 8f;
         [Range(1, 4)] public int maxPartySize = 4;
@@ -62,7 +66,6 @@ namespace MilkIt.NPCs
         [Tooltip("Fraction of patience left when the customer starts looking frustrated.")]
         [Range(0f, 1f)] public float frustratedAt = 0.35f;
         [Tooltip("Price per drink, in the same order as Drinks. Missing entries use Default Price.")]
-        public int[] drinkPrices;
         [Min(0)] public int defaultPrice = 3;
         [Tooltip("Optional marker above each customer's head (patience bar, payment popup).")]
         public CustomerPatienceIndicator patienceIndicatorPrefab;
@@ -72,14 +75,16 @@ namespace MilkIt.NPCs
         public bool requireOrderClick;
         [Tooltip("Debug: take orders automatically instead of waiting for the player.")]
         public bool autoTakeOrders;
-        [Tooltip("Drink pictures (from the coffee poster), in the same order as Drinks.")]
-        public Texture2D[] drinkIcons = new Texture2D[0];
         [Tooltip("Optional speech bubble that shows the order above the customer.")]
         public CustomerOrderBubble orderBubblePrefab;
         public bool autoServe;
         public bool showDebugPanel = true;
         [Tooltip("Off: the panel only shows Serve buttons for customers waiting for their drink.")]
         public bool fullDebugPanel = true;
+
+        public int[] drinkPrices;
+        public Texture2D[] drinkIcons;
+        public string[] drinks;
 
         // The order ID identifies one visit, even when multiple customers want the same drink.
         public event Action<int, string> OrderPlaced;
@@ -110,13 +115,20 @@ namespace MilkIt.NPCs
             DrinkType[] drinkTypes = Resources.LoadAll<DrinkType>("DrinkTypes");
             drinks = drinkTypes.Select(d => d.name).ToArray();
             drinkPrices = drinkTypes.Select(d => d.price).ToArray();
+            drinkIcons = drinkTypes.Select(d => d.icon).ToArray();
             DrinkHandedOver += (customerController, gameObject) =>
             {
                 if (!gameObject.TryGetComponent<FluidContainer>(out FluidContainer fluidContainer))
                     return;
                 (float drinkScore, DrinkType predictedDrink) = DrinkGrader.GradeDrink(fluidContainer);
                 string drinkName = predictedDrink.name; // Why are we operating on magic fucking strings for names of drinks................... Love you Claude
-                TryDeliverDrink(customerController.OrderId, drinkName, Mathf.RoundToInt(drinkScore * PriceOf(drinkName)));
+                if (!TryDeliverDrink(customerController.OrderId, drinkName, Mathf.RoundToInt(drinkScore * PriceOf(drinkName)))) return;
+                ForceRelease(gameObject);
+                if (gameObject.TryGetComponent<Resetable>(out Resetable reset))
+                    fluidContainer.Remove(fluidContainer.Total);
+                    reset.ResetObject();
+                    return;
+                Destroy(gameObject);
             };
         }
 
@@ -260,6 +272,7 @@ namespace MilkIt.NPCs
         {
             Earnings += amount;
             feedback = $"Customer {customer.OrderId} paid {amount} for {customer.Drink}.";
+            if (scoreFace) scoreFace.text = $"{Earnings.ToString()}$";
             CustomerPaid?.Invoke(customer.OrderId, amount);
             return amount;
         }
@@ -312,6 +325,21 @@ namespace MilkIt.NPCs
                     TryDeliverDrink(customer.OrderId, customer.Drink, PriceOf(customer.Drink));
                 if (autoTakeOrders && customer.State == CustomerState.WaitingAtTill)
                     TakeOrder(customer);
+            }
+        }
+        private void ForceRelease(GameObject gameObject)
+        {
+            XRGrabInteractable grab = gameObject.GetComponent<XRGrabInteractable>();
+            if (grab == null || !grab.isSelected)
+                return;
+
+            var manager = grab.interactionManager;
+            if (manager == null)
+                return;
+
+            foreach (var interactor in grab.interactorsSelecting.ToArray())
+            {
+                manager.SelectExit(interactor, grab);
             }
         }
 

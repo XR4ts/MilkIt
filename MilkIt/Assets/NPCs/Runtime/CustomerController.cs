@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using MilkIt.Interaction;
 
 namespace MilkIt.NPCs
 {
@@ -91,15 +91,14 @@ namespace MilkIt.NPCs
             if (head == null) { bubble.heightAtTill = 1.4f; bubble.heightSeated = 1.9f; }
         }
 
-        // A solid collider so the player can select this customer with a controller ray, poke or mouse click.
         public void MakeSelectable()
         {
             var collider = gameObject.AddComponent<CapsuleCollider>();
             collider.center = Vector3.up * 0.9f;
             collider.height = 1.8f;
             collider.radius = 0.3f;
-            var interactable = gameObject.AddComponent<XRSimpleInteractable>();
-            interactable.selectEntered.AddListener(_ => { if (cafe != null) cafe.TakeOrder(this); });
+            var button = gameObject.AddComponent<TriggerButton>();
+            button.onPressed.AddListener(() => { if (cafe != null) cafe.TakeOrder(this); });
         }
 
         // Seated and waiting: an invisible zone over the customer and their half of the table, so the player can
