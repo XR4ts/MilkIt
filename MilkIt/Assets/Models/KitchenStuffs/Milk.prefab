@@ -1606,11 +1606,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45f0dc49063ae6484bbf18d53a4938fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MilkIt.Fluids.FluidContainer
-  capacity: 4000
+  capacity: 6000
   layers:
   - type: {fileID: 11400000, guid: 90c472831bf85f91f84391719b0ea973, type: 2}
     amount: 2000
     quality: 1
+    isHot: 0
   opening: {fileID: 845163461216111130}
   openingRadius: 0.045
   depth: 0.1

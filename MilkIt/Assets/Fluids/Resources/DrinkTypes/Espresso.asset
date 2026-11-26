@@ -17,4 +17,5 @@ MonoBehaviour:
   ingredients:
   - type: {fileID: 11400000, guid: 62160502f1fcb835f9148baf431ee8b1, type: 2}
     ingredientPercentageInDrink: 1
-  expectedDrinkMililiters: 0
+  expectedDrinkMililiters: 40
+  icon: {fileID: 2800000, guid: f56563c18dcf74e16b1b16dd99bc1fbe, type: 3}
