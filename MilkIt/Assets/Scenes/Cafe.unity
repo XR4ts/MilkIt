@@ -16916,6 +16916,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: refrigerator.001
       objectReference: {fileID: 0}
+    - target: {fileID: 8503160039246054084, guid: 6ec718a48e8402e4e9f04c2ec5519f3a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.35328117
+      objectReference: {fileID: 0}
+    - target: {fileID: 8503160039246054084, guid: 6ec718a48e8402e4e9f04c2ec5519f3a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.000000014901158
+      objectReference: {fileID: 0}
+    - target: {fileID: 8503160039246054084, guid: 6ec718a48e8402e4e9f04c2ec5519f3a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.000000089406946
+      objectReference: {fileID: 0}
+    - target: {fileID: 8503160039246054084, guid: 6ec718a48e8402e4e9f04c2ec5519f3a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.9355172
+      objectReference: {fileID: 0}
+    - target: {fileID: 8503160039246054084, guid: 6ec718a48e8402e4e9f04c2ec5519f3a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -138.624
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
