@@ -1,10 +1,11 @@
+using MilkIt.Interaction;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace MilkIt.NPCs
 {
     // OPEN / CLOSED sign hanging on the entrance, like a real shop sign: one side says OPEN, the other CLOSED.
-    // Selecting it (controller ray, poke or desktop click) toggles the café's service and turns the board over,
+    // Pointing at it (controller ray or hand) and pulling the trigger, or a desktop click, toggles the café's service and turns the board over,
     // so the street side always shows the café's state (and the inside shows the opposite).
     public sealed class CafeOpenSign : MonoBehaviour
     {
@@ -28,8 +29,21 @@ namespace MilkIt.NPCs
 
         void Awake()
         {
-            var interactable = GetComponent<XRSimpleInteractable>();
-            if (interactable != null) interactable.selectEntered.AddListener(_ => Toggle());
+            // The sign in the scene still carries the old XRSimpleInteractable, which reacts to grip.
+            var simple = GetComponent<XRSimpleInteractable>();
+            if (simple != null)
+            {
+                simple.enabled = false; // unregisters it now; Destroy only happens at the end of the frame
+                Destroy(simple);
+            }
+            var button = GetComponent<TriggerButton>();
+            if (button == null) button = gameObject.AddComponent<TriggerButton>();
+            button.onPressed.AddListener(Toggle);
+            if (button.highlightRenderer == null && board != null)
+            {
+                var plate = board.Find("Plate");
+                if (plate != null) button.highlightRenderer = plate.GetComponent<Renderer>();
+            }
             if (attachTo != null) attachOffset = transform.position - attachTo.position;
             SetFace(insideFace, "OPEN", openColor);
             SetFace(outsideFace, "CLOSED", closedColor);

@@ -274,7 +274,7 @@ namespace MilkIt.NPCs.Editor
             sign.transform.position = new Vector3(panelBounds.center.x, 1.45f, panelBounds.min.z - 0.03f);
             var collider = sign.AddComponent<BoxCollider>();
             collider.size = new Vector3(0.48f, 0.26f, 0.04f);
-            sign.AddComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRSimpleInteractable>();
+            sign.AddComponent<MilkIt.Interaction.TriggerButton>();
             var board = new GameObject("Board").transform;
             board.SetParent(sign.transform, false);
             Block("Plate", board, Vector3.zero, new Vector3(0.46f, 0.24f, 0.015f), PrimitiveType.Cube, Unlit("SignPlate", new Color(0.97f, 0.95f, 0.88f)));
