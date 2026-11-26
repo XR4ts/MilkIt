@@ -36,6 +36,7 @@ namespace MilkIt.NPCs
 
     public sealed class CafeCustomerSystem : MonoBehaviour
     {
+        public TextMesh scoreFace;
         public Transform entrance;
         public Transform exit;
         [Tooltip("Optional point just inside the entrance, before joining the counter queue.")]
@@ -126,6 +127,7 @@ namespace MilkIt.NPCs
                 if (gameObject.TryGetComponent<Resetable>(out Resetable reset))
                     fluidContainer.Remove(fluidContainer.Total);
                     reset.ResetObject();
+                    return;
                 Destroy(gameObject);
             };
         }
@@ -270,6 +272,7 @@ namespace MilkIt.NPCs
         {
             Earnings += amount;
             feedback = $"Customer {customer.OrderId} paid {amount} for {customer.Drink}.";
+            if (scoreFace) scoreFace.text = $"{Earnings.ToString()}$";
             CustomerPaid?.Invoke(customer.OrderId, amount);
             return amount;
         }

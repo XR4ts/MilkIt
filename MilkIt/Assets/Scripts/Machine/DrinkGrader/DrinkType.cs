@@ -15,7 +15,6 @@ namespace MilkIt.Machine.DrinkGrader{
         public int price;
         public List<DrinkIngredient> ingredients;
         public float expectedDrinkMililiters;
-        public float volumeImportance = 0.3f;
         public Texture2D icon;
         public float MatchScore(IReadOnlyList<FluidLayer> fluidLayers, float totalFluids)
         {
@@ -35,11 +34,10 @@ namespace MilkIt.Machine.DrinkGrader{
                 }
                 float diff = Mathf.Abs((layer.amount / totalFluids) - matchingIngredient.ingredientPercentageInDrink);
                 float volumeDiff = Mathf.Abs(totalFluids - expectedDrinkMililiters) / Mathf.Max(totalFluids, expectedDrinkMililiters);
-                totalError += diff + volumeDiff * volumeImportance;
-                // uncoutableError += volumeDiff;
+                totalError += diff + volumeDiff;
             }
-            if (totalError > 3) return 0;
-            return (3 - totalError) / 3;
+            if (totalError > 4) return 0;
+            return (4 - totalError) / 4;
         }
     }
     [Serializable]
